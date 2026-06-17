@@ -1,0 +1,37 @@
+# logs
+logs/
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.so.*
+*.dylib
+*.egg-info/
+*.egg
+dist/
+build/
+*.pyc
+*.pyo
+
+# virtual environment
+.venv/
+venv/
+env/
+
+# uv
+uv.lock
+
+# ide
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# tmp / scratch
+tmp/
+temp/
+*.tmp
