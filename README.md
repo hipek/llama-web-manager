@@ -22,13 +22,11 @@ Open http://localhost:8000 in your browser.
 
 ## Configuration
 
-Edit `config.yaml`:
+Copy `config.yaml.example` to `config.yaml` and edit paths:
 
-```yaml
-llama_server_path: /home/jacek/llama/bin/llama-server
-models_dir: /opt/data/jacek/models
-server_port: 11434
-server_host: 0.0.0.0
-web_port: 8000
-log_lines: 10
+```bash
+cp config.yaml.example config.yaml
+```
+
+See [config.yaml.example](config.yaml.example) for all options.
 ```
