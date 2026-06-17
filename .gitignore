@@ -1,6 +1,9 @@
 # logs
 config.yaml
 
+# frontend
+node_modules/
+
 logs/
 
 # python
