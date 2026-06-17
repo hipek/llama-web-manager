@@ -17,11 +17,10 @@ def scan_models(models_dir: str) -> list[ModelFile]:
     if not dir_path.exists():
         return []
     models = []
-    for root, _dirs, files in os.walk(models_dir):
-        for fname in files:
-            if fname.endswith(".gguf"):
-                full = os.path.join(root, fname)
-                size = os.path.getsize(full)
-                models.append(ModelFile(name=fname, path=full, size=size))
+    for fname in os.listdir(models_dir):
+        full = os.path.join(models_dir, fname)
+        if fname.endswith(".gguf") and os.path.isfile(full):
+            size = os.path.getsize(full)
+            models.append(ModelFile(name=fname, path=full, size=size))
     models.sort(key=lambda m: m.name.lower())
     return models
