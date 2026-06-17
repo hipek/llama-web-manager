@@ -14,7 +14,6 @@ Web interface to browse, load and serve LLM models via llama.cpp server.
 ## Quick Start
 
 ```bash
-cd /home/jacek/work/llama-web-manager
 ./web.sh
 ```
 
