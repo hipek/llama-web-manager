@@ -130,6 +130,7 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#0f172a;c
 </div>
 
 <script>
+const SERVER_PORT = {{ server_port }};
 const toastEl = document.getElementById('toast');
 const overlay = document.getElementById('overlay');
 const overlayText = document.getElementById('overlay-text');
@@ -183,6 +184,15 @@ async function pollStatus() {
     const data = await res.json();
     if (data.running) {
       showLoading('Model ' + (data.model ? data.model.split('/').pop() : '') + ' loading...');
+      try {
+        const health = await fetch('http://' + window.location.hostname + ':' + SERVER_PORT + '/health');
+        if (health.ok) {
+          hideLoading();
+          showToast('Model loaded');
+          location.reload();
+          return;
+        }
+      } catch(_) {}
       setTimeout(pollStatus, 3000);
     } else {
       hideLoading();
