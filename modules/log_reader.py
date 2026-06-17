@@ -14,13 +14,13 @@ def read_last_lines(log_path: str, n: int = 10) -> list[str]:
             return []
         buf = b""
         pos = size
-        lines = 0
-        while pos > 0 and lines <= n:
-            pos -= 1
+        chunk = 4096
+        while pos > 0:
+            read_size = min(chunk, pos)
+            pos -= read_size
             f.seek(pos)
-            buf = f.read(size - pos) + buf
-            if buf.count(b"\n") >= n:
+            buf = f.read(read_size) + buf
+            if buf.count(b"\n") >= n + 1:
                 break
-        text = buf.decode("utf-8", errors="replace")
-        result = text.splitlines()
-        return result[-n:]
+        lines = buf.decode("utf-8", errors="replace").splitlines()
+        return lines[-n:]
