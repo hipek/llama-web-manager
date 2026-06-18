@@ -23,7 +23,7 @@ trap cleanup EXIT INT TERM
 # Start Python backend
 echo "[web.sh] Starting backend (uvicorn)..."
 cd "$ROOT_DIR"
-python main.py &
+uv run main.py &
 BACKEND_PID=$!
 
 # Start frontend dev server
