@@ -1,7 +1,12 @@
-.PHONY: test build run stop
+.PHONY: test build run stop check-types ci
 
 test:
 	uv run pytest tests/
+
+check-types:
+	cd frontend && pnpm tsc --noEmit
+
+ci: check-types test
 
 build:
 	docker build --build-arg VITE_API_URL=$(VITE_API_URL) \
