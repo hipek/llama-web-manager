@@ -6,7 +6,8 @@ Web interface to browse, load and serve LLM models via llama.cpp server.
 
 - **Python backend** (`app/main.py`) — FastAPI REST API for model management, log reading, and server control
 - **Config layer** (`config/loader.py`) — Loads `config.yaml` into a frozen dataclass; validates all options at startup
-- **Business logic** (`modules/`) — `ServerManager` (spawns/kills llama.cpp), `ModelScanner` (finds `.gguf` files), `LogReader` (tail log output)
+- **Business logic** (`modules/`) — `ServerManager` (spawns/kills llama.cpp with SIGKILL fallback), `ModelScanner` (finds `.gguf` files), `LogReader` (tail log output)
+- **Tests** (`tests/`) — pytest suite with 42 tests
 - **Vite frontend** — TypeScript SPA that calls the backend API
 - **Tooling** (`web.sh` / `server.sh`) — Shell wrappers that handle startup, cleanup, and `.env` scaffolding
 - **Dependency manager** — [uv](https://docs.astral.sh/uv/) (see Quick Start)
@@ -107,8 +108,22 @@ cp config.yaml.example config.yaml
 | `web_port` | `9000` | Backend API port |
 | `log_lines` | `10` | Lines of log output to return in `/status` |
 | `context_size` | `80000` | Context size passed to llama.cpp |
+| `threads` | `8` | Number of CPU threads |
+| `temp` | `0.2` | Sampling temperature |
+| `top_p` | `0.9` | Top-p sampling threshold |
+| `top_k` | `10` | Top-k sampling threshold |
+| `min_p` | `0.05` | Minimum probability for sampling |
+| `no_mmap` | `true` | Disable memory-mapped file I/O |
 
 See [config.yaml.example](config.yaml.example) for all options.
+
+## Testing
+
+```bash
+make test
+# or
+uv run pytest tests/
+```
 
 ### Frontend (`frontend/.env`)
 
