@@ -32,11 +32,13 @@ cd "$FRONTEND_DIR"
 npm run dev &
 FRONTEND_PID=$!
 
+WEB_PORT=$(grep -E '^\s*web_port:\s*[0-9]+' "$ROOT_DIR/config.yaml" | head -1 | awk '{print $2}')
+FRONTEND_PORT=$(grep -E '^\s+port:\s*[0-9]+' "$FRONTEND_DIR/vite.config.ts" | head -1 | awk '{print $2}')
 API_URL=$(grep '^VITE_API_URL=' "$FRONTEND_DIR/.env" | cut -d= -f2)
 echo ""
-echo "  Backend:  http://0.0.0.0:8000"
-echo "  Frontend: http://localhost:5173"
-echo "  API:      ${API_URL:-http://192.168.1.153:8000}"
+echo "  Backend:  http://0.0.0.0:${WEB_PORT}"
+echo "  Frontend: http://localhost:${FRONTEND_PORT}"
+echo "  API:      ${API_URL}"
 echo ""
 echo "  Press Ctrl+C to stop both."
 echo ""

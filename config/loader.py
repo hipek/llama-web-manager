@@ -12,7 +12,7 @@ class ServerConfig:
     models_dir: str
     server_port: int = 11434
     server_host: str = "0.0.0.0"
-    web_port: int = 8000
+    web_port: int = 9000
     log_lines: int = 10
     context_size: int = 80000
 
