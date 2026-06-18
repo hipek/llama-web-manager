@@ -2,6 +2,28 @@ import type { ServerConfig, StatusResponse, ModelFile } from './types'
 
 const API_BASE = import.meta.env.VITE_API_URL ?? ''
 
+let _backendOnline = true
+
+export function getBackendOnline(): boolean {
+  return _backendOnline
+}
+
+export async function checkBackend(): Promise<boolean> {
+  try {
+    const res = await fetch(API_BASE + '/status')
+    const wasOffline = !_backendOnline
+    _backendOnline = res.ok
+    if (_backendOnline && wasOffline) {
+      import('./ui').then(m => m.hideOfflineBanner())
+    }
+    return _backendOnline
+  } catch {
+    _backendOnline = false
+    import('./ui').then(m => m.showOfflineBanner())
+    return false
+  }
+}
+
 async function api(path: string, init?: RequestInit): Promise<Response> {
   return fetch(API_BASE + path, init)
 }

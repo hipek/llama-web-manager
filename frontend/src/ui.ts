@@ -1,6 +1,15 @@
 const toastEl = document.getElementById('toast')!
 const overlayEl = document.getElementById('overlay')!
 const overlayTextEl = document.getElementById('overlay-text')!
+const offlineBanner = document.getElementById('offline-banner')!
+
+export function showOfflineBanner() {
+  offlineBanner.style.display = ''
+}
+
+export function hideOfflineBanner() {
+  offlineBanner.style.display = 'none'
+}
 
 export function showToast(msg: string, type: 'success' | 'error' = 'success') {
   toastEl.textContent = msg

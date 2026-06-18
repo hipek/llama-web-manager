@@ -57,12 +57,26 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#0f172a;c
 .loading-box p{color:#94a3b8;font-size:.9rem}
 .api-link{display:inline-flex;align-items:center;gap:.4rem;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:.4rem .8rem;font-size:.8rem;color:#38bdf8;text-decoration:none;transition:all .2s}
 .api-link:hover{border-color:#38bdf8;background:#1e293b80}
+.offline-banner{background:#7f1d1d;border:1px solid #b91c1c;border-bottom:none;padding:.75rem 1.5rem;text-align:center}
+.offline-banner-inner{display:flex;align-items:center;justify-content:center;gap:.75rem;flex-wrap:wrap}
+.offline-icon{font-size:1.25rem}
+.offline-text{color:#fca5a5;font-size:.9rem}
+.offline-retry{background:#991b1b;color:#fca5a5;border:1px solid #b91c1c;border-radius:6px;padding:.35rem .8rem;font-size:.8rem;cursor:pointer;transition:all .2s}
+.offline-retry:hover{background:#b91c1c;color:#fbbf24}
 @media(max-width:640px){.container{padding:1rem}.header{padding:1rem}.model-card{flex-direction:column;align-items:flex-start;gap:.75rem}.btn-group{width:100%}.btn-group .btn{flex:1;text-align:center}}
 </style>
 </head>
 <body>
 <div class="loading-overlay" id="overlay"><div class="loading-box"><div class="spinner"></div><p id="overlay-text">Loading model...</p></div></div>
 <div class="toast" id="toast"></div>
+
+<div class="offline-banner" id="offline-banner" style="display:none">
+  <div class="offline-banner-inner">
+    <span class="offline-icon">⚠️</span>
+    <span class="offline-text">Backend server is offline. Check that the server is running and your connection is stable.</span>
+    <span class="offline-retry" id="offline-retry">↻ Retry</span>
+  </div>
+</div>
 
 <div class="header">
 <h1><span>llama</span>-web-manager</h1>

@@ -1,4 +1,4 @@
-import { fetchConfig, fetchStatus, fetchModels, loadModel, stopServer } from './api'
+import { fetchConfig, fetchStatus, fetchModels, loadModel, stopServer, checkBackend, getBackendOnline } from './api'
 import { showToast, showLoading, hideLoading, modelName } from './ui'
 import type { ServerConfig, ModelFile, RecentModel } from './types'
 
@@ -134,6 +134,7 @@ async function pollStatus() {
     }
   } catch (e: unknown) {
     hideLoading()
+    if (!getBackendOnline()) return // banner already shown
     showToast(e instanceof Error ? e.message : 'Status check failed', 'error')
   }
 }
@@ -184,6 +185,10 @@ async function init() {
   })
 
   document.getElementById('refresh-log-btn')!.addEventListener('click', async () => {
+    if (!getBackendOnline()) {
+      showToast('Backend is offline', 'error')
+      return
+    }
     try {
       const status = await fetchStatus()
       renderLogs(status.log_lines)
@@ -201,12 +206,20 @@ async function init() {
         : 'bottom'
   })
 
+  // Periodic log refresh
   setInterval(async () => {
+    if (!getBackendOnline()) return
     try {
       const status = await fetchStatus()
       renderLogs(status.log_lines)
     } catch { /* silent */ }
   }, 5000)
+
+  // Health check: every 15s
+  setInterval(checkBackend, 15000)
+
+  // Retry button
+  document.getElementById('offline-retry')!.addEventListener('click', checkBackend)
 }
 
 document.addEventListener('DOMContentLoaded', init)
