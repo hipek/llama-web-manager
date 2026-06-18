@@ -29,7 +29,7 @@ BACKEND_PID=$!
 # Start frontend dev server
 echo "[web.sh] Starting frontend (vite dev)..."
 cd "$FRONTEND_DIR"
-npm run dev &
+pnpm dev &
 FRONTEND_PID=$!
 
 WEB_PORT=$(grep -E '^\s*web_port:\s*[0-9]+' "$ROOT_DIR/config.yaml" | head -1 | awk '{print $2}')

@@ -24,7 +24,7 @@ Starts backend + frontend together, kills both on Ctrl+C.
 ./server.sh
 
 # Terminal 2 — Frontend dev server (hot-reload)
-cd frontend && npm install && npm run dev
+cd frontend && pnpm install && pnpm dev
 ```
 
 Open http://localhost:8000 in your browser.
@@ -32,7 +32,7 @@ Open http://localhost:8000 in your browser.
 ## Production Build
 
 ```bash
-cd frontend && npm run build   # outputs to frontend/dist/
+cd frontend && pnpm build   # outputs to frontend/dist/
 ```
 
 Then serve the built files with any static server (nginx, Caddy, `python -m http.server`, etc.) pointing to the backend API at `localhost:9000`.
