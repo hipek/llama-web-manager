@@ -61,7 +61,14 @@ class ServerManager:
                 "--log-timestamps",
                 "--timeout", "-1",
                 "--ctx-size", str(self._config.context_size),
+                "--threads", str(self._config.threads),
+                "--temp", str(self._config.temp),
+                "--top-p", str(self._config.top_p),
+                "--top-k", str(self._config.top_k),
+                "--min-p", str(self._config.min_p),
             ]
+            if self._config.no_mmap:
+                cmd.append("--no-mmap")
             self._process = subprocess.Popen(
                 cmd,
                 stdout=subprocess.PIPE,

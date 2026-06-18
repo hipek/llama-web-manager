@@ -7,4 +7,11 @@ server_port: 11434
 server_host: 0.0.0.0
 web_port: 9000
 log_lines: 10
-context_size: 80000
+llamacpp_params:
+  context_size: 80000
+  threads: 8
+  temp: 0.2
+  top_p: 0.9
+  top_k: 10
+  min_p: 0.05
+  no_mmap: false
