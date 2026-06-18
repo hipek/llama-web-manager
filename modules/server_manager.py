@@ -39,11 +39,16 @@ class ServerManager:
                 return args[i + 1]
         return None
 
-    def stop(self) -> None:
+    def stop(self, timeout: int = 10) -> None:
         with self._lock:
             if self._process is not None and self._process.poll() is None:
                 try:
                     self._process.send_signal(signal.SIGTERM)
+                    try:
+                        self._process.wait(timeout=timeout)
+                    except subprocess.TimeoutExpired:
+                        self._process.send_signal(signal.SIGKILL)
+                        self._process.wait()
                 except Exception:
                     pass
                 self._process = None
