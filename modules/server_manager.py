@@ -60,6 +60,7 @@ class ServerManager:
                 "--log-prefix",
                 "--log-timestamps",
                 "--timeout", "-1",
+                "--ctx-size", str(self._config.context_size),
             ]
             self._process = subprocess.Popen(
                 cmd,
