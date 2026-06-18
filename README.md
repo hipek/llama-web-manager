@@ -2,64 +2,40 @@
 
 Web interface to browse, load and serve LLM models via llama.cpp server.
 
-## Features
+## Architecture
 
-- Browse `.gguf` models from a configurable directory
-- Load, switch and stop models with one click
-- Live server log output (auto-refreshes every 5 seconds)
-- REST API: `GET /models`, `GET /status`, `POST /load`, `POST /stop`
-- Dark theme UI with Inter font
-- Configurable server port, host and web port via `config.yaml`
+- **Python backend** (`server.sh`) — REST API for model management, log reading, server control
+- **Vite frontend** — TypeScript SPA that calls the backend API
 
 ## Quick Start
 
 ```bash
-./web.sh
+# Terminal 1 — Python backend API
+./server.sh
+
+# Terminal 2 — Frontend dev server (hot-reload)
+cd frontend && npm install && npm run dev
 ```
 
-Open http://localhost:8000 in your browser.
+Open http://localhost:5173 in your browser.
 
-## Frontend
-
-The web UI is a [Vite](https://vitejs.dev/) + TypeScript project in [`frontend/`](frontend/).
-
-### Build
+## Development
 
 ```bash
-cd frontend
-npm install
-npm run build
+# Start backend API
+./server.sh
+
+# Start frontend (auto-proxies /api/*, /status, /models, /load, /stop → localhost:8000)
+cd frontend && npm run dev
 ```
 
-The server serves the built files from `frontend/dist/`. Run the build step before starting the server, or after any changes to `frontend/src/`.
-
-### Development (live reload)
+## Production Build
 
 ```bash
-cd frontend
-npm run dev        # starts Vite dev server on :5173
+cd frontend && npm run build   # outputs to frontend/dist/
 ```
 
-In another terminal, start the Python server:
-
-```bash
-./web.sh
-```
-
-The Vite dev server proxies API calls (`/api/*`, `/status`, `/models`, etc.) to `localhost:8000`. Open the Vite URL for hot-reload.
-
-### Project structure
-
-```
-frontend/
-  index.html          # Static shell (no inline JS)
-  src/
-    main.ts           # Init, event handlers, polling, localStorage
-    api.ts            # API fetch wrappers
-    ui.ts             # Toast, loading overlay helpers
-    types.ts          # TypeScript interfaces
-  dist/               # Build output (gitignored)
-```
+Then serve the built files with any static server (nginx, Caddy, `python -m http.server`, etc.) pointing to the backend API at `localhost:8000`.
 
 ## Configuration
 
@@ -70,4 +46,3 @@ cp config.yaml.example config.yaml
 ```
 
 See [config.yaml.example](config.yaml.example) for all options.
-```

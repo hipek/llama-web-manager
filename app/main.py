@@ -4,8 +4,7 @@ import os
 from pathlib import Path
 
 from fastapi import APIRouter, FastAPI, Request
-from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
 
 from config.loader import load_config
 from modules.model_scanner import scan_models
@@ -17,20 +16,6 @@ config = load_config(BASE_DIR / "config.yaml")
 manager = ServerManager(config)
 
 router = APIRouter()
-DIST_DIR = BASE_DIR / "frontend" / "dist"
-
-
-@router.get("/", response_class=HTMLResponse)
-async def index():
-    path = DIST_DIR / "index.html"
-    if path.exists():
-        return FileResponse(path)
-    return HTMLResponse(
-        "<h1>Frontend not built</h1>"
-        "<p>Run <code>cd frontend && npm install && npm run build</code> then restart the server.</p>",
-        status_code=200,
-    )
-
 
 @router.post("/load")
 async def load_model(request: Request):
@@ -74,6 +59,4 @@ async def get_config():
 
 
 app = FastAPI()
-if DIST_DIR.exists():
-    app.mount("/assets", StaticFiles(directory=str(DIST_DIR / "assets")), name="assets")
 app.include_router(router)
