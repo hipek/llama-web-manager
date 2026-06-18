@@ -4,8 +4,18 @@ Web interface to browse, load and serve LLM models via llama.cpp server.
 
 ## Architecture
 
-- **Python backend** (`server.sh` / `web.sh`) — REST API for model management, log reading, server control
+- **Python backend** (`app/main.py`) — FastAPI REST API for model management, log reading, and server control
+- **Config layer** (`config/loader.py`) — Loads `config.yaml` into a frozen dataclass; validates all options at startup
+- **Business logic** (`modules/`) — `ServerManager` (spawns/kills llama.cpp), `ModelScanner` (finds `.gguf` files), `LogReader` (tail log output)
 - **Vite frontend** — TypeScript SPA that calls the backend API
+- **Tooling** (`web.sh` / `server.sh`) — Shell wrappers that handle startup, cleanup, and `.env` scaffolding
+- **Dependency manager** — [uv](https://docs.astral.sh/uv/) (see Quick Start)
+
+## Prerequisites
+
+- [uv](https://docs.astral.sh/uv/) for Python dependency management (install via `curl -LsSf https://astral.sh/uv/install.sh | sh`)
+- [pnpm](https://pnpm.io/) for the frontend
+- A llama.cpp [release binary](https://github.com/ggerganov/llama.cpp/releases) (download and set `llama_server_path` in `config.yaml`)
 
 ## Quick Start
 
@@ -27,7 +37,7 @@ Starts backend + frontend together, kills both on Ctrl+C.
 cd frontend && pnpm install && pnpm dev
 ```
 
-Open http://localhost:8000 in your browser.
+Open the frontend URL shown by `web.sh` (defaults to `http://localhost:8000`).
 
 ## Production Build
 
@@ -35,7 +45,48 @@ Open http://localhost:8000 in your browser.
 cd frontend && pnpm build   # outputs to frontend/dist/
 ```
 
-Then serve the built files with any static server (nginx, Caddy, `python -m http.server`, etc.) pointing to the backend API at `localhost:9000`.
+Then serve the built files with a reverse proxy. For example, with **Caddy** (`Caddyfile`):
+
+```caddy
+your.domain.com {
+  root * /var/www/frontend/dist
+  file_server
+  encode gzip
+
+  # Proxy API calls to the backend
+  reverse_proxy /api/* localhost:9000
+  reverse_proxy /status localhost:9000
+  reverse_proxy /models localhost:9000
+  reverse_proxy /load localhost:9000
+  reverse_proxy /stop localhost:9000
+}
+```
+
+Or with **nginx**:
+
+```nginx
+server {
+    listen 80;
+    server_name your.domain.com;
+
+    root /var/www/frontend/dist;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location /api/ {
+        proxy_pass http://localhost:9000;
+    }
+    location /status { proxy_pass http://localhost:9000; }
+    location /models { proxy_pass http://localhost:9000; }
+    location /load { proxy_pass http://localhost:9000; }
+    location /stop { proxy_pass http://localhost:9000; }
+}
+```
+
+For local development without a reverse proxy, `web.sh` proxies API calls via Vite's `vite.config.ts` dev server (see `frontend/vite.config.ts`).
 
 ## Configuration
 
