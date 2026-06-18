@@ -40,6 +40,37 @@ cd frontend && pnpm install && pnpm dev
 
 Open the frontend URL shown by `web.sh` (defaults to `http://localhost:8000`).
 
+## Docker
+
+Build and run the frontend via Docker:
+
+```bash
+# Set backend API URL (or use default from frontend/.env.example)
+export VITE_API_URL=http://localhost:9000
+
+# Build
+make build
+
+# Run
+make run
+
+# Stop
+make stop
+```
+
+Or manually:
+
+```bash
+docker build --build-arg VITE_API_URL=http://localhost:9000 \
+  -t llama-web-manager-frontend frontend/
+
+docker run -d --name llama-web-manager-frontend \
+  -p 8000:8000 \
+  llama-web-manager-frontend
+```
+
+The image serves the frontend on port **8000** via nginx.
+
 ## Production Build
 
 ```bash
