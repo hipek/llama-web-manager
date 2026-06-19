@@ -170,7 +170,10 @@ async function pollStatus() {
             location.reload()
             return
           }
-        } catch { /* server not ready yet */ }
+        } catch {
+          hideLoading()
+          showToast('Server not ready yet, retrying...')
+        }
         setTimeout(pollStatus, 3000)
       } else {
         // restarted without model
