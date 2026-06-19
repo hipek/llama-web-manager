@@ -5,6 +5,8 @@ import type { ServerConfig, ModelFile, RecentModel, LlammaCppParams } from './ty
 const RECENT_KEY = 'llama-web-manager-recent'
 let CONFIG: ServerConfig
 let logScrollState: 'bottom' | 'user' = 'bottom'
+let _pollRetry = 0
+const MAX_POLL_RETRIES = 60 // 3 minutes max (60 × 3s)
 
 const PARAMS = [
   { key: 'context_size', label: 'Context Size', min: 1024, max: 262144, step: 1024, unit: '' },
@@ -162,15 +164,33 @@ async function pollStatus() {
     if (status.running) {
       if (status.model) {
         showLoading('Model ' + modelName(status.model) + ' loading...')
+
+        // Primary: health endpoint
+        let ready = false
         try {
           const health = await fetch(`http://${window.location.hostname}:${CONFIG.server_port}/health`)
-          if (health.ok) {
-            hideLoading()
-            showToast('Model loaded')
-            location.reload()
-            return
-          }
+          ready = health.ok
         } catch { /* server not ready yet */ }
+
+        // Fallback: check log_lines for loaded/ready keywords
+        if (!ready) {
+          const logText = (status.log_lines || []).join('\n').toLowerCase()
+          ready = logText.includes('loaded') || logText.includes('ready')
+        }
+
+        if (ready) {
+          hideLoading()
+          showToast('Model loaded')
+          location.reload()
+          return
+        }
+
+        _pollRetry++
+        if (_pollRetry >= MAX_POLL_RETRIES) {
+          hideLoading()
+          showToast('Model loading timed out', 'error')
+          return
+        }
         setTimeout(pollStatus, 3000)
       } else {
         // restarted without model
