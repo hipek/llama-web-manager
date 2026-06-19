@@ -7,7 +7,7 @@ frontend/dist/
 frontend/.env
 *.tsbuildinfo
 
-logs/
+/logs/
 
 # python
 __pycache__/
