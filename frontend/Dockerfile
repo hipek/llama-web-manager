@@ -21,7 +21,7 @@ FROM nginx:1.26-alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # Copy nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Create non-root user, nginx cache dirs, and set ownership
 RUN adduser -D -g '' appuser && \
