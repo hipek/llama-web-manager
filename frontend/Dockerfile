@@ -7,8 +7,7 @@ RUN npm install -g pnpm && pnpm install --frozen-lockfile
 
 COPY frontend/ .
 ARG NEXT_PUBLIC_API_URL
-ARG VITE_API_URL
-ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-${VITE_API_URL:-http://localhost:9000}}
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:9000}
 RUN pnpm build
 
 # Runner stage
