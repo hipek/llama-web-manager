@@ -35,34 +35,34 @@ export default function DashboardPage() {
 
   // Poll status periodically for loading progress
   const pollLoading = useCallback(async () => {
-    if (!status?.running) return
     try {
       const res = await fetch('/api/status')
       const data = await res.json()
       if (data.ready) {
         setLoadingVisible(false)
         showToast('Model loaded')
-        setTimeout(() => window.location.reload(), 1000)
-      } else if (!data.model) {
+      } else if (data.running && !data.model) {
         setLoadingVisible(false)
         showToast('Server restarted')
-        setTimeout(() => window.location.reload(), 1000)
       }
     } catch {
       // silent
     }
-  }, [status?.running, showToast])
+  }, [showToast])
 
   // Start loading poll when overlay shows
   const startLoading = useCallback((text: string) => {
     setLoadingText(text)
     setLoadingVisible(true)
-    const interval = setInterval(pollLoading, 3000)
+    // Wait 2 seconds before first check to ensure model is loaded
     setTimeout(() => {
-      clearInterval(interval)
-      setLoadingVisible(false)
-      showError('Model loading timed out')
-    }, 180000) // 3 min timeout
+      const interval = setInterval(pollLoading, 3000)
+      setTimeout(() => {
+        clearInterval(interval)
+        setLoadingVisible(false)
+        showError('Model loading timed out')
+      }, 180000) // 3 min timeout
+    }, 2000)
   }, [pollLoading, showError])
 
   const handleLoadModel = useCallback(async (path: string, name: string) => {

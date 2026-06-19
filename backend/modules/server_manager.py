@@ -15,6 +15,7 @@ class ServerManager:
         self._config = config
         self._process: subprocess.Popen | None = None
         self._current_model: str | None = None
+        self._ready: bool = False
         self._lock = threading.Lock()
         self._log_path = self._resolve_log_path()
 
@@ -59,6 +60,7 @@ class ServerManager:
     def start(self, model_path: str) -> dict:
         self.stop()
         with self._lock:
+            self._ready = False
             cmd = self._build_cmd(model_path)
             self._process = subprocess.Popen(
                 cmd,
@@ -95,6 +97,7 @@ class ServerManager:
         """Stop and restart llama-server with current config params and model."""
         self.stop()
         with self._lock:
+            self._ready = False
             cmd = self._build_cmd(self._current_model)
             self._process = subprocess.Popen(
                 cmd,
@@ -109,10 +112,16 @@ class ServerManager:
         """Check if llama.cpp has finished loading and is ready to serve."""
         if not self.is_running:
             return False
+        # Once ready, stay ready until next start/restart
+        if self._ready:
+            return True
         # Check last 20 lines for "llama_server: model loaded" (model loaded)
         lines = read_last_lines(self._log_path, 20)
         log_text = "\n".join(lines).lower()
-        return "llama_server: model loaded" in log_text
+        if "llama_server: model loaded" in log_text:
+            self._ready = True
+            return True
+        return False
 
     def get_status(self) -> dict:
         with self._lock:
