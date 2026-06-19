@@ -12,8 +12,8 @@ RUN npm install -g pnpm@9 && pnpm install --frozen-lockfile
 COPY . .
 
 # Build application
-ARG VITE_API_URL=http://192.168.1.153:9000
-RUN VITE_API_URL=${VITE_API_URL} pnpm build
+ARG VITE_API_URL
+RUN VITE_API_URL=${VITE_API_URL:-http://192.168.1.153:9000} pnpm build
 
 # Final stage
 FROM nginx:1.26-alpine
