@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { fetchStatus, getBackendOnline } from '@/lib/api-client'
 import type { StatusResponse } from '@/types'
 
@@ -10,6 +10,7 @@ export function useStatus() {
   const [loading, setLoading] = useState(true)
   const [retryCount, setRetryCount] = useState(0)
   const [scrollState, setScrollState] = useState<'bottom' | 'user'>('bottom')
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const poll = useCallback(async () => {
     if (!getBackendOnline()) return
@@ -18,24 +19,34 @@ export function useStatus() {
       const data = await fetchStatus()
       setStatus(data)
       setRetryCount(0)
+      setLoading(false)
     } catch {
       setRetryCount(prev => prev + 1)
     }
   }, [])
 
+  // Stop polling after MAX_POLL_RETRIES consecutive failures
   useEffect(() => {
-    let interval: ReturnType<typeof setInterval> | null = null
-    let timeout: ReturnType<typeof setTimeout> | null = null
+    if (retryCount >= MAX_POLL_RETRIES && intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
+      setLoading(false)
+    }
+  }, [retryCount])
 
+  useEffect(() => {
     async function startPolling() {
       await poll()
-      interval = setInterval(poll, POLL_INTERVAL)
+      intervalRef.current = setInterval(poll, POLL_INTERVAL)
     }
 
     startPolling()
 
     return () => {
-      if (interval) clearInterval(interval)
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      }
     }
   }, [poll])
 

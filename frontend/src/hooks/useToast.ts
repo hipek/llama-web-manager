@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 
 interface Toast {
   id: number
@@ -8,17 +8,17 @@ interface Toast {
 
 export function useToast() {
   const [toasts, setToasts] = useState<Toast[]>([])
-  const [nextId, setNextId] = useState(0)
+  const nextIdRef = useRef(0)
 
   const addToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
-    const id = nextId
-    setNextId(prev => prev + 1)
+    const id = nextIdRef.current
+    nextIdRef.current += 1
     setToasts(prev => [...prev, { id, message, type }])
 
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id))
     }, 3000)
-  }, [nextId])
+  }, [])
 
   const showToast = useCallback((message: string, type?: 'success' | 'error') => {
     addToast(message, type || 'success')

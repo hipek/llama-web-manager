@@ -3,11 +3,12 @@
 interface Props {
   visible: boolean
   message: string
+  confirmLabel?: string
   onConfirm: () => void
   onCancel: () => void
 }
 
-export function ConfirmDialog({ visible, message, onConfirm, onCancel }: Props) {
+export function ConfirmDialog({ visible, message, confirmLabel, onConfirm, onCancel }: Props) {
   if (!visible) return null
 
   return (
@@ -19,7 +20,7 @@ export function ConfirmDialog({ visible, message, onConfirm, onCancel }: Props) 
             onClick={onConfirm}
             className="btn btn-danger"
           >
-            Yes, Restart
+            {confirmLabel || 'Confirm'}
           </button>
           <button
             onClick={onCancel}

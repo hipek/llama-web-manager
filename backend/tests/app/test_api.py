@@ -102,7 +102,7 @@ class TestStopEndpoint:
 
 class TestConfigEndpoint:
     def test_get_config(self, client, mock_config):
-        resp = client.get("/api/config")
+        resp = client.get("/config")
         assert resp.status_code == 200
         data = resp.json()
         assert data["server_port"] == 11434

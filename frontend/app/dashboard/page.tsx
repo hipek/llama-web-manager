@@ -16,7 +16,7 @@ import { SettingsForm } from '@/components/settings/SettingsForm'
 import { LogViewer } from '@/components/logs/LogViewer'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { loadModel, stopServer, saveConfig, restartServer, checkBackend } from '@/lib/api-client'
-import { saveRecentModel, modelName } from '@/lib/utils'
+import { modelName } from '@/lib/utils'
 import type { LlammaCppParams } from '@/types'
 
 export default function DashboardPage() {
@@ -30,6 +30,8 @@ export default function DashboardPage() {
   const [loadingText, setLoadingText] = useState('')
   const [confirmVisible, setConfirmVisible] = useState(false)
   const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null)
+  const [confirmMessage, setConfirmMessage] = useState('')
+  const [confirmLabel, setConfirmLabel] = useState('')
 
   // Poll status periodically for loading progress
   const pollLoading = useCallback(async () => {
@@ -67,7 +69,7 @@ export default function DashboardPage() {
     startLoading('Loading ' + name + '...')
     try {
       await loadModel(path)
-      saveRecentModel(path, name)
+      addRecent(path, name)
       showToast('Loading ' + name + '...')
     } catch (e: unknown) {
       setLoadingVisible(false)
@@ -77,6 +79,8 @@ export default function DashboardPage() {
 
   const handleStopServer = useCallback(async () => {
     setConfirmVisible(true)
+    setConfirmMessage('Are you sure you want to stop the server?')
+    setConfirmLabel('Stop Server')
     setConfirmAction(async () => {
       try {
         await stopServer()
@@ -99,9 +103,12 @@ export default function DashboardPage() {
 
   const handleRestartServer = useCallback(() => {
     setConfirmVisible(true)
+    setConfirmMessage('Are you sure you want to restart the server?')
+    setConfirmLabel('Yes, Restart')
     setConfirmAction(async () => {
       try {
         await restartServer()
+        setLoadingVisible(true)
         showToast('Server restarting...')
         // Start loading poll
         const interval = setInterval(pollLoading, 3000)
@@ -133,6 +140,8 @@ export default function DashboardPage() {
   const handleCancel = useCallback(() => {
     setConfirmVisible(false)
     setConfirmAction(null)
+    setConfirmMessage('')
+    setConfirmLabel('')
   }, [])
 
   if (configLoading) {
@@ -214,7 +223,8 @@ export default function DashboardPage() {
       <LoadingOverlay visible={loadingVisible} text={loadingText} />
       <ConfirmDialog
         visible={confirmVisible}
-        message="Are you sure you want to restart the server?"
+        message={confirmMessage}
+        confirmLabel={confirmLabel}
         onConfirm={handleConfirm}
         onCancel={handleCancel}
       />

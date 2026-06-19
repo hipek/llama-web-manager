@@ -69,7 +69,7 @@ def _get_llm_params(cfg) -> dict:
     }
 
 
-@router.get("/api/config")
+@router.get("/config")
 async def get_config():
     return {
         "server_port": config.server_port,

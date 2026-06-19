@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import type { LlammaCppParams } from '@/types'
 import { ParamControl, PARAM_DEFS } from './ParamControl'
 
@@ -10,9 +11,14 @@ interface Props {
 }
 
 export function SettingsForm({ params, onSave, onRestart }: Props) {
+  const [localParams, setLocalParams] = useState<LlammaCppParams>(params)
+
+  useEffect(() => {
+    setLocalParams(params)
+  }, [params])
+
   const handleChange = (key: string, value: number | boolean) => {
-    const updated = { ...params, [key]: value }
-    onSave(updated)
+    setLocalParams(prev => ({ ...prev, [key]: value }))
   }
 
   return (
@@ -22,14 +28,14 @@ export function SettingsForm({ params, onSave, onRestart }: Props) {
           <ParamControl
             key={def.key}
             param={def}
-            value={(params as any)[def.key]}
+            value={(localParams as any)[def.key]}
             onChange={handleChange}
           />
         ))}
       </div>
       <div className="flex gap-3">
         <button
-          onClick={() => onSave(params)}
+          onClick={() => onSave(localParams)}
           className="btn btn-primary"
         >
           Save

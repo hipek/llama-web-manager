@@ -4,7 +4,7 @@ test:
 	uv run pytest backend/tests/
 
 check-types:
-	cd frontend && pnpm tsc --noEmit
+	cd frontend && pnpm exec tsc --noEmit
 
 ci: check-types test
 
