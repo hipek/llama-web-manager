@@ -12,7 +12,7 @@ export interface ServerConfig {
   server_port: number
   server_host: string
   models_dir: string
-  llamacpp_params?: LlammaCppParams
+  llamacpp_params: LlammaCppParams
 }
 
 export interface StatusResponse {

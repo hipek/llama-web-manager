@@ -31,7 +31,17 @@ async function api(path: string, init?: RequestInit): Promise<Response> {
 export async function fetchConfig(): Promise<ServerConfig> {
   const res = await api('/api/config')
   if (!res.ok) throw new Error('Failed to load config')
-  return res.json()
+  const data = await res.json()
+  data.llamacpp_params = data.llamacpp_params ?? {
+    context_size: 80000,
+    threads: 8,
+    temp: 0.2,
+    top_p: 0.9,
+    top_k: 10,
+    min_p: 0.05,
+    no_mmap: false,
+  }
+  return data
 }
 
 export async function fetchStatus(): Promise<StatusResponse> {
@@ -63,11 +73,15 @@ export async function stopServer(): Promise<void> {
 }
 
 export async function saveConfig(params: LlammaCppParams): Promise<void> {
-  console.log('[Phase 1 stub] Config save:', params)
-  throw new Error('Config write not yet implemented — Phase 2')
+  const res = await api('/config', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ llamacpp_params: params }),
+  })
+  if (!res.ok) throw new Error('Failed to save config')
 }
 
 export async function restartServer(): Promise<void> {
-  console.log('[Phase 1 stub] Restart requested')
-  throw new Error('Restart not yet implemented — Phase 2')
+  const res = await api('/restart', { method: 'POST' })
+  if (!res.ok) throw new Error('Failed to restart server')
 }

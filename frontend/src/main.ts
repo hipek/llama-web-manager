@@ -200,15 +200,7 @@ async function init() {
   renderModelList(models, status.running)
   renderRecent()
   renderLogs(status.log_lines)
-  renderSettings(CONFIG.llamacpp_params ?? {
-    context_size: 80000,
-    threads: 8,
-    temp: 0.2,
-    top_p: 0.9,
-    top_k: 10,
-    min_p: 0.05,
-    no_mmap: false,
-  })
+  renderSettings(CONFIG.llamacpp_params)
 
   document.getElementById('model-list')!.addEventListener('click', e => {
     const btn = (e.target as HTMLElement).closest('[data-action="load-model"]') as HTMLElement | null

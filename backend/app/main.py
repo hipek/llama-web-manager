@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+import yaml
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -13,7 +14,8 @@ from backend.modules.server_manager import ServerManager
 from backend.modules.log_reader import read_last_lines
 
 BASE_DIR = Path(__file__).parent.parent.parent
-config = load_config(BASE_DIR / "config.yaml")
+config_path = BASE_DIR / "config.yaml"
+config = load_config(config_path)
 manager = ServerManager(config)
 
 router = APIRouter()
@@ -50,13 +52,67 @@ async def list_models():
     ])
 
 
+VALID_LLM_PARAMS = {
+    "context_size", "threads", "temp", "top_p", "top_k", "min_p", "no_mmap"
+}
+
+
+def _get_llm_params(cfg) -> dict:
+    return {
+        "context_size": cfg.context_size,
+        "threads": cfg.threads,
+        "temp": cfg.temp,
+        "top_p": cfg.top_p,
+        "top_k": cfg.top_k,
+        "min_p": cfg.min_p,
+        "no_mmap": cfg.no_mmap,
+    }
+
+
 @router.get("/api/config")
 async def get_config():
     return {
         "server_port": config.server_port,
         "server_host": config.server_host,
         "models_dir": config.models_dir,
+        "llamacpp_params": _get_llm_params(config),
     }
+
+
+@router.post("/config")
+async def update_config(request: Request):
+    body = await request.json()
+    params = body.get("llamacpp_params", {})
+
+    for key in params:
+        if key not in VALID_LLM_PARAMS:
+            return JSONResponse(
+                {"error": f"Unknown param: {key}"}, status_code=400
+            )
+
+    with open(config_path) as f:
+        data = yaml.safe_load(f)
+
+    data["llamacpp_params"] = {**data.get("llamacpp_params", {}), **params}
+
+    with open(config_path, 'w') as f:
+        yaml.dump(data, f, default_flow_style=False)
+
+    global config
+    config = load_config(config_path)
+
+    return {"status": "saved", "llamacpp_params": params}
+
+
+@router.post("/restart")
+async def restart_server():
+    manager.stop()
+    global config
+    config = load_config(config_path)
+    with manager._lock:
+        manager._process = None
+        manager._log_path = manager._resolve_log_path()
+    return {"status": "stopped", "message": "Server stopped. Load a model to restart with new params."}
 
 
 app = FastAPI()
