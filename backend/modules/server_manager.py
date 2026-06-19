@@ -13,6 +13,7 @@ class ServerManager:
     def __init__(self, config: ServerConfig):
         self._config = config
         self._process: subprocess.Popen | None = None
+        self._current_model: str | None = None
         self._lock = threading.Lock()
         self._log_path = self._resolve_log_path()
 
@@ -52,6 +53,7 @@ class ServerManager:
                 except Exception:
                     pass
                 self._process = None
+                self._current_model = None
 
     def start(self, model_path: str) -> dict:
         self.stop()
@@ -63,6 +65,7 @@ class ServerManager:
                 stderr=subprocess.STDOUT,
                 text=True,
             )
+            self._current_model = model_path
         return {"status": "loading", "model": model_path}
 
     def _build_cmd(self, model_path: str | None = None) -> list[str]:
@@ -88,10 +91,10 @@ class ServerManager:
         return cmd
 
     def restart(self) -> dict:
-        """Stop and restart llama-server with current config params."""
+        """Stop and restart llama-server with current config params and model."""
         self.stop()
         with self._lock:
-            cmd = self._build_cmd()
+            cmd = self._build_cmd(self._current_model)
             self._process = subprocess.Popen(
                 cmd,
                 stdout=subprocess.PIPE,
@@ -103,13 +106,7 @@ class ServerManager:
     def get_status(self) -> dict:
         with self._lock:
             running = self._process is not None and self._process.poll() is None
-            model = None
-            if self._process:
-                args: list[str] = list(self._process.args)  # type: ignore
-                for i, arg in enumerate(args):
-                    if arg == "--model" and i + 1 < len(args):
-                        model = args[i + 1]
-                        break
+            model = self._current_model
         return {
             "running": running,
             "model": model,

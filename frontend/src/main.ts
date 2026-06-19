@@ -160,17 +160,25 @@ async function pollStatus() {
   try {
     const status = await fetchStatus()
     if (status.running) {
-      showLoading('Model ' + modelName(status.model) + ' loading...')
-      try {
-        const health = await fetch(`http://${window.location.hostname}:${CONFIG.server_port}/health`)
-        if (health.ok) {
-          hideLoading()
-          showToast('Model loaded')
-          location.reload()
-          return
-        }
-      } catch { /* server not ready yet */ }
-      setTimeout(pollStatus, 3000)
+      if (status.model) {
+        showLoading('Model ' + modelName(status.model) + ' loading...')
+        try {
+          const health = await fetch(`http://${window.location.hostname}:${CONFIG.server_port}/health`)
+          if (health.ok) {
+            hideLoading()
+            showToast('Model loaded')
+            location.reload()
+            return
+          }
+        } catch { /* server not ready yet */ }
+        setTimeout(pollStatus, 3000)
+      } else {
+        // restarted without model
+        hideLoading()
+        showToast('Server restarted')
+        location.reload()
+        return
+      }
     } else {
       hideLoading()
       showToast('Model stopped')
