@@ -151,6 +151,7 @@ async function handleLoadModel(path: string, name: string) {
     await loadModel(path)
     saveRecent(path, name)
     showToast('Loading ' + name + '...')
+    await new Promise(resolve => setTimeout(resolve, 2000))
     pollStatus()
   } catch (e: unknown) {
     hideLoading()
