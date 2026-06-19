@@ -27,14 +27,14 @@ uv run -m backend.main &
 BACKEND_PID=$!
 
 # Start frontend dev server
-echo "[web.sh] Starting frontend (vite dev)..."
+echo "[web.sh] Starting frontend (next dev)..."
 cd "$FRONTEND_DIR"
 pnpm dev &
 FRONTEND_PID=$!
 
 WEB_PORT=$(grep -E '^\s*web_port:\s*[0-9]+' "$ROOT_DIR/config.yaml" | head -1 | awk '{print $2}')
-FRONTEND_PORT=$(grep -E '^\s+port:\s*[0-9]+' "$FRONTEND_DIR/vite.config.ts" | head -1 | awk '{print $2}')
-API_URL=$(grep '^VITE_API_URL=' "$FRONTEND_DIR/.env" | cut -d= -f2)
+FRONTEND_PORT=8000
+API_URL=$(grep '^NEXT_PUBLIC_API_URL=' "$FRONTEND_DIR/.env.local" | cut -d= -f2)
 echo ""
 echo "  Backend:  http://0.0.0.0:${WEB_PORT}"
 echo "  Frontend: http://localhost:${FRONTEND_PORT}"
