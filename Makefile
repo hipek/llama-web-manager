@@ -9,8 +9,8 @@ check-types:
 ci: check-types test
 
 build:
-	docker build --build-arg NEXT_PUBLIC_API_URL=$(NEXT_PUBLIC_API_URL) \
-	  -t llama-web-manager-frontend:latest frontend/
+	docker build -f frontend/Dockerfile --build-arg NEXT_PUBLIC_API_URL=$(NEXT_PUBLIC_API_URL) \
+	  -t llama-web-manager-frontend:latest .
 
 run:
 	docker run -d --name llama-web-manager-frontend \
