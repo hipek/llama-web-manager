@@ -25,16 +25,11 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Create non-root user, nginx cache dirs, and set ownership
 RUN adduser -D -g '' appuser && \
-    mkdir -p /var/cache/nginx/client_temp && \
-    mkdir -p /var/cache/nginx/proxy_temp && \
-    mkdir -p /var/cache/nginx/fastcgi_temp && \
-    mkdir -p /var/cache/nginx/uwsgi_temp && \
-    mkdir -p /var/cache/nginx/scgi_temp && \
     touch /run/nginx.pid && \
+    chown appuser:appuser /run/nginx.pid && \
     chown -R appuser:appuser /usr/share/nginx/html && \
     chown -R appuser:appuser /etc/nginx/conf.d && \
     chown -R appuser:appuser /var/cache/nginx && \
-    chown -R appuser:appuser /run && \
     chown -R appuser:appuser /var/log/nginx
 
 USER appuser
