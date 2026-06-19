@@ -13,7 +13,7 @@ COPY . .
 
 # Build application
 ARG VITE_API_URL
-RUN VITE_API_URL=${VITE_API_URL} pnpm build
+RUN if [ -z "${VITE_API_URL}" ]; then echo "ERROR: VITE_API_URL must be provided at build time"; exit 1; fi && VITE_API_URL=${VITE_API_URL} pnpm build
 
 # Final stage
 FROM nginx:1.26-alpine
