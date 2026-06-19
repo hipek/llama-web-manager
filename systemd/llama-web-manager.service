@@ -1,0 +1,14 @@
+[Unit]
+Description=llama-web-manager
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/home/jacek/work/llama-web-manager/server.sh
+WorkingDirectory=/home/jacek/work/llama-web-manager
+Restart=on-failure
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target
