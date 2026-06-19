@@ -290,15 +290,14 @@ async function init() {
   })
 
   // Restart settings button
-  document.getElementById('restart-settings-btn')!.addEventListener('click', () => {
-    showConfirm('Restart server with new parameters? Current model will be unloaded.', async () => {
-      try {
-        await restartServer()
-        showToast('Restarting server...')
-      } catch (e: unknown) {
-        showToast(e instanceof Error ? e.message : 'Failed to restart', 'error')
-      }
-    })
+  document.getElementById('restart-settings-btn')!.addEventListener('click', async () => {
+    try {
+      await restartServer()
+      showToast('Server restarting...')
+      pollStatus()
+    } catch (e: unknown) {
+      showToast(e instanceof Error ? e.message : 'Failed to restart', 'error')
+    }
   })
 }
 

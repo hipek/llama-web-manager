@@ -106,13 +106,10 @@ async def update_config(request: Request):
 
 @router.post("/restart")
 async def restart_server():
-    manager.stop()
     global config
     config = load_config(config_path)
-    with manager._lock:
-        manager._process = None
-        manager._log_path = manager._resolve_log_path()
-    return {"status": "stopped", "message": "Server stopped. Load a model to restart with new params."}
+    result = manager.restart()
+    return {"status": "restarted", **result}
 
 
 app = FastAPI()
