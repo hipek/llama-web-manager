@@ -117,9 +117,8 @@ class ServerManager:
     def get_status(self) -> dict:
         with self._lock:
             running = self._process is not None and self._process.poll() is None
-            model = self._current_model
         return {
             "running": running,
-            "model": model,
+            "model": self.current_model,
             "ready": self.is_ready,
         }
