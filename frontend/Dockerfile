@@ -12,8 +12,8 @@ RUN npm install -g pnpm@9 && pnpm install --frozen-lockfile
 COPY . .
 
 # Build application
-ARG VITE_API_URL
-RUN if [ -z "${VITE_API_URL}" ]; then echo "ERROR: VITE_API_URL must be provided at build time"; exit 1; fi && VITE_API_URL=${VITE_API_URL} pnpm build
+ARG VITE_API_URL=http://192.168.1.153:9000
+RUN VITE_API_URL=${VITE_API_URL} pnpm build
 
 # Final stage
 FROM nginx:1.26-alpine
