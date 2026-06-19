@@ -11,6 +11,7 @@ export function modelName(path: string | null): string {
 }
 
 export function getRecentModels(): RecentModel[] {
+  if (typeof window === 'undefined') return []
   try {
     const data = localStorage.getItem('llama-web-manager-recent')
     return data ? JSON.parse(data) : []
@@ -20,6 +21,7 @@ export function getRecentModels(): RecentModel[] {
 }
 
 export function saveRecentModel(path: string, name: string): void {
+  if (typeof window === 'undefined') return
   const list = getRecentModels()
   const filtered = list.filter((m: RecentModel) => m.path !== path)
   filtered.unshift({ path, name, time: Date.now() })
