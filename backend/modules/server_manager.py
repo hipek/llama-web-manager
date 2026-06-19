@@ -109,10 +109,10 @@ class ServerManager:
         """Check if llama.cpp has finished loading and is ready to serve."""
         if not self.is_running:
             return False
-        # Check last 20 lines for "all slots are idle" (model fully loaded)
+        # Check last 20 lines for "llama_server: model loaded" (model loaded)
         lines = read_last_lines(self._log_path, 20)
         log_text = "\n".join(lines).lower()
-        return "all slots are idle" in log_text
+        return "llama_server: model loaded" in log_text
 
     def get_status(self) -> dict:
         with self._lock:
