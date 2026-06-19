@@ -1,4 +1,4 @@
-import type { ServerConfig, StatusResponse, ModelFile } from './types'
+import type { ServerConfig, StatusResponse, ModelFile, LlammaCppParams } from './types'
 
 const API_BASE = import.meta.env.VITE_API_URL ?? ''
 
@@ -60,4 +60,14 @@ export async function stopServer(): Promise<void> {
   const res = await api('/stop', { method: 'POST' })
   const data = await res.json()
   if (data.error) throw new Error(data.error)
+}
+
+export async function saveConfig(params: LlammaCppParams): Promise<void> {
+  console.log('[Phase 1 stub] Config save:', params)
+  throw new Error('Config write not yet implemented — Phase 2')
+}
+
+export async function restartServer(): Promise<void> {
+  console.log('[Phase 1 stub] Restart requested')
+  throw new Error('Restart not yet implemented — Phase 2')
 }

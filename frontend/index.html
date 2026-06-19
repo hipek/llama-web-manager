@@ -104,6 +104,18 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#0f172a;c
 </div>
 </div>
 
+<div class="section" id="settings-section">
+<h2>⚙️ llama.cpp Parameters</h2>
+<div id="settings-form" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem">
+<div style="color:#64748b;padding:1rem">Loading settings...</div>
+</div>
+<div style="margin-top:1rem;display:flex;gap:0.75rem">
+<button class="btn btn-primary" id="save-settings-btn">Save</button>
+<button class="btn btn-danger" id="restart-settings-btn">Restart Server</button>
+</div>
+<div id="settings-status" style="margin-top:0.5rem;font-size:0.85rem;color:#94a3b8"></div>
+</div>
+
 <div class="section log-section">
 <h2>📋 Server Log
 <span style="margin-left:1rem">

@@ -1,10 +1,20 @@
-import { fetchConfig, fetchStatus, fetchModels, loadModel, stopServer, checkBackend, getBackendOnline } from './api'
-import { showToast, showLoading, hideLoading, modelName } from './ui'
-import type { ServerConfig, ModelFile, RecentModel } from './types'
+import { fetchConfig, fetchStatus, fetchModels, loadModel, stopServer, checkBackend, getBackendOnline, saveConfig, restartServer } from './api'
+import { showToast, showLoading, hideLoading, modelName, showConfirm } from './ui'
+import type { ServerConfig, ModelFile, RecentModel, LlammaCppParams } from './types'
 
 const RECENT_KEY = 'llama-web-manager-recent'
 let CONFIG: ServerConfig
 let logScrollState: 'bottom' | 'user' = 'bottom'
+
+const PARAMS = [
+  { key: 'context_size', label: 'Context Size', min: 1024, max: 262144, step: 1024, unit: '' },
+  { key: 'threads', label: 'Threads', min: 1, max: 128, step: 1, unit: '' },
+  { key: 'temp', label: 'Temperature', min: 0, max: 2, step: 0.05, unit: '' },
+  { key: 'top_p', label: 'Top P', min: 0, max: 1, step: 0.05, unit: '' },
+  { key: 'top_k', label: 'Top K', min: 1, max: 100, step: 1, unit: '' },
+  { key: 'min_p', label: 'Min P', min: 0, max: 1, step: 0.01, unit: '' },
+  { key: 'no_mmap', label: 'No MMAP', min: 0, max: 1, step: 1, unit: '' },
+]
 
 function getRecent(): RecentModel[] {
   try {
@@ -99,6 +109,40 @@ function renderLogs(lines: string[]) {
   }
 }
 
+function renderSettings(params: LlammaCppParams) {
+  const form = document.getElementById('settings-form')!
+  form.innerHTML = PARAMS.map(p => {
+    const val = (params as any)[p.key]
+    const isBool = typeof val === 'boolean'
+    return `
+      <div style="background:#1e293b;border:1px solid #334155;border-radius:8px;padding:0.75rem 1rem">
+        <label style="display:flex;justify-content:space-between;align-items:center;gap:1rem">
+          <span style="font-size:0.85rem;color:#94a3b8">${p.label}</span>
+          <input type="${isBool ? 'checkbox' : 'range'}"
+            class="param-input" data-key="${p.key}"
+            ${isBool ? (val ? 'checked' : '') : `value="${val}" min="${p.min}" max="${p.max}" step="${p.step}"`}
+            ${isBool ? '' : `style="width:120px"`} />
+          <span class="param-value" data-key="${p.key}" style="font-family:monospace;font-size:0.85rem;color:#38bdf8;min-width:60px;text-align:right">
+            ${isBool ? (val ? 'ON' : 'OFF') : val}
+          </span>
+        </label>
+      </div>
+    `
+  }).join('')
+
+  form.querySelectorAll('.param-input').forEach(input => {
+    input.addEventListener('input', () => {
+      const key = (input as HTMLInputElement).dataset.key!
+      const display = form.querySelector(`.param-value[data-key="${key}"]`) as HTMLElement
+      if ((input as HTMLInputElement).type === 'checkbox') {
+        display.textContent = (input as HTMLInputElement).checked ? 'ON' : 'OFF'
+      } else {
+        display.textContent = (input as HTMLInputElement).value
+      }
+    })
+  })
+}
+
 async function handleLoadModel(path: string, name: string) {
   showLoading('Loading ' + name + '...')
   try {
@@ -156,6 +200,15 @@ async function init() {
   renderModelList(models, status.running)
   renderRecent()
   renderLogs(status.log_lines)
+  renderSettings(CONFIG.llamacpp_params ?? {
+    context_size: 80000,
+    threads: 8,
+    temp: 0.2,
+    top_p: 0.9,
+    top_k: 10,
+    min_p: 0.05,
+    no_mmap: false,
+  })
 
   document.getElementById('model-list')!.addEventListener('click', e => {
     const btn = (e.target as HTMLElement).closest('[data-action="load-model"]') as HTMLElement | null
@@ -220,6 +273,41 @@ async function init() {
 
   // Retry button
   document.getElementById('offline-retry')!.addEventListener('click', checkBackend)
+
+  // Save settings button
+  document.getElementById('save-settings-btn')!.addEventListener('click', async () => {
+    const form = document.getElementById('settings-form')!
+    const params: LlammaCppParams = { ...CONFIG.llamacpp_params! }
+    form.querySelectorAll('.param-input').forEach(input => {
+      const key = (input as HTMLInputElement).dataset.key!
+      if ((input as HTMLInputElement).type === 'checkbox') {
+        (params as any)[key] = (input as HTMLInputElement).checked
+      } else {
+        const step = parseFloat((input as HTMLInputElement).step) || 1
+        ;(params as any)[key] = step % 1 === 0
+          ? parseInt((input as HTMLInputElement).value)
+          : parseFloat((input as HTMLInputElement).value)
+      }
+    })
+    try {
+      await saveConfig(params)
+      showToast('Settings saved')
+    } catch (e: unknown) {
+      showToast(e instanceof Error ? e.message : 'Failed to save settings', 'error')
+    }
+  })
+
+  // Restart settings button
+  document.getElementById('restart-settings-btn')!.addEventListener('click', () => {
+    showConfirm('Restart server with new parameters? Current model will be unloaded.', async () => {
+      try {
+        await restartServer()
+        showToast('Restarting server...')
+      } catch (e: unknown) {
+        showToast(e instanceof Error ? e.message : 'Failed to restart', 'error')
+      }
+    })
+  })
 }
 
 document.addEventListener('DOMContentLoaded', init)
