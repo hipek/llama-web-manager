@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from config.loader import ServerConfig, load_config
+from backend.config.loader import ServerConfig, load_config
 
 
 class TestServerConfigDefaults:

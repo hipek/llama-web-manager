@@ -4,8 +4,8 @@ import signal
 import subprocess
 from unittest.mock import MagicMock, patch
 
-from config.loader import ServerConfig
-from modules.server_manager import ServerManager
+from backend.config.loader import ServerConfig
+from backend.modules.server_manager import ServerManager
 
 
 def _make_process(returncode=None, args=None):
@@ -97,7 +97,7 @@ class TestStop:
 
 class TestStart:
     def test_start_creates_process(self, tmp_config: ServerConfig):
-        with patch("modules.server_manager.subprocess.Popen") as mock_popen:
+        with patch("backend.modules.server_manager.subprocess.Popen") as mock_popen:
             mock_popen.return_value = _make_process(returncode=None)
             sm = ServerManager(tmp_config)
             result = sm.start("/path/to/model.gguf")
@@ -123,7 +123,7 @@ class TestStart:
             min_p=tmp_config.min_p,
             no_mmap=True,
         )
-        with patch("modules.server_manager.subprocess.Popen") as mock_popen:
+        with patch("backend.modules.server_manager.subprocess.Popen") as mock_popen:
             mock_popen.return_value = _make_process(returncode=None)
             sm = ServerManager(cfg)
             sm.start("/path/to/model.gguf")
@@ -134,7 +134,7 @@ class TestStart:
         sm = ServerManager(tmp_config)
         sm._process = _make_process(returncode=None)
         with patch.object(sm, "stop") as mock_stop:
-            with patch("modules.server_manager.subprocess.Popen") as mock_popen:
+            with patch("backend.modules.server_manager.subprocess.Popen") as mock_popen:
                 mock_popen.return_value = _make_process(returncode=None)
                 sm.start("/path/to/model.gguf")
                 mock_stop.assert_called_once()

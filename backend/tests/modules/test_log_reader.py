@@ -3,7 +3,7 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-from modules.log_reader import read_last_lines
+from backend.modules.log_reader import read_last_lines
 
 
 class TestReadLastLines:

@@ -6,7 +6,7 @@ import subprocess
 import threading
 from pathlib import Path
 
-from config.loader import ServerConfig
+from backend.config.loader import ServerConfig
 
 
 class ServerManager:

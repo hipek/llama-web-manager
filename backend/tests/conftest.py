@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from config.loader import ServerConfig, load_config
+from backend.config.loader import ServerConfig, load_config
 
 
 @pytest.fixture

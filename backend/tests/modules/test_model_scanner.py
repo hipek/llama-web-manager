@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from modules.model_scanner import scan_models, ModelFile
+from backend.modules.model_scanner import scan_models, ModelFile
 
 
 class TestScanModels:

@@ -1,7 +1,7 @@
 .PHONY: test build run stop check-types ci
 
 test:
-	uv run pytest tests/
+	uv run pytest backend/tests/
 
 check-types:
 	cd frontend && pnpm tsc --noEmit

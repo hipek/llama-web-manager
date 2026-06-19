@@ -7,12 +7,12 @@ from fastapi import APIRouter, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from config.loader import load_config
-from modules.model_scanner import scan_models
-from modules.server_manager import ServerManager
-from modules.log_reader import read_last_lines
+from backend.config.loader import load_config
+from backend.modules.model_scanner import scan_models
+from backend.modules.server_manager import ServerManager
+from backend.modules.log_reader import read_last_lines
 
-BASE_DIR = Path(__file__).parent.parent
+BASE_DIR = Path(__file__).parent.parent.parent
 config = load_config(BASE_DIR / "config.yaml")
 manager = ServerManager(config)
 

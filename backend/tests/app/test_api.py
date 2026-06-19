@@ -8,7 +8,7 @@ import httpx2
 import pytest
 from starlette.testclient import TestClient
 
-from app.main import app
+from backend.app.main import app
 
 
 @pytest.fixture
@@ -34,8 +34,8 @@ def mock_config(tmp_path: Path):
 @pytest.fixture
 def client(mock_manager, mock_config):
     # Patch the module-level instances
-    with patch("app.main.manager", mock_manager) as p1, \
-         patch("app.main.config", mock_config) as p2:
+    with patch("backend.app.main.manager", mock_manager) as p1, \
+         patch("backend.app.main.config", mock_config) as p2:
         yield TestClient(app)
 
 
@@ -60,12 +60,12 @@ class TestStatusEndpoint:
 
 class TestModelsEndpoint:
     def test_list_models(self, client, mock_config):
-        from modules.model_scanner import ModelFile
+        from backend.modules.model_scanner import ModelFile
         mock_models = [
             ModelFile(name="a.gguf", path="/models/a.gguf", size=1024),
             ModelFile(name="b.gguf", path="/models/b.gguf", size=2048),
         ]
-        with patch("app.main.scan_models", return_value=mock_models):
+        with patch("backend.app.main.scan_models", return_value=mock_models):
             resp = client.get("/models")
             assert resp.status_code == 200
             data = resp.json()

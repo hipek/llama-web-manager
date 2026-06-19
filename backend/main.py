@@ -4,13 +4,13 @@
 import sys
 import uvicorn
 
-from config.loader import load_config
-from app.main import app
+from backend.config.loader import load_config
+from backend.app.main import app
 
 if __name__ == "__main__":
     config = load_config()
     uvicorn.run(
-        "app.main:app",
+        "backend.app.main:app",
         host="0.0.0.0",
         port=config.web_port,
         reload=False,
