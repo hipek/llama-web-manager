@@ -165,20 +165,8 @@ async function pollStatus() {
       if (status.model) {
         showLoading('Model ' + modelName(status.model) + ' loading...')
 
-        // Primary: health endpoint
-        let ready = false
-        try {
-          const health = await fetch(`http://${window.location.hostname}:${CONFIG.server_port}/health`)
-          ready = health.ok
-        } catch { /* server not ready yet */ }
-
-        // Fallback: check log_lines for loaded/ready keywords
-        if (!ready) {
-          const logText = (status.log_lines || []).join('\n').toLowerCase()
-          ready = logText.includes('loaded') || logText.includes('ready')
-        }
-
-        if (ready) {
+        // Backend checks log for "all slots are idle" = model fully loaded
+        if (status.ready) {
           hideLoading()
           showToast('Model loaded')
           location.reload()

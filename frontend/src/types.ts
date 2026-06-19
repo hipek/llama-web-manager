@@ -18,6 +18,7 @@ export interface ServerConfig {
 export interface StatusResponse {
   running: boolean
   model: string | null
+  ready: boolean
   log_lines: string[]
 }
 

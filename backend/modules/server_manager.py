@@ -7,6 +7,7 @@ import threading
 from pathlib import Path
 
 from backend.config.loader import ServerConfig
+from backend.modules.log_reader import read_last_lines
 
 
 class ServerManager:
@@ -103,6 +104,16 @@ class ServerManager:
             )
         return {"status": "restarting"}
 
+    @property
+    def is_ready(self) -> bool:
+        """Check if llama.cpp has finished loading and is ready to serve."""
+        if not self.is_running:
+            return False
+        # Check last 100 lines for "all slots are idle" (model fully loaded)
+        lines = read_last_lines(self._log_path, 100)
+        log_text = "\n".join(lines).lower()
+        return "all slots are idle" in log_text
+
     def get_status(self) -> dict:
         with self._lock:
             running = self._process is not None and self._process.poll() is None
@@ -110,4 +121,5 @@ class ServerManager:
         return {
             "running": running,
             "model": model,
+            "ready": self.is_ready,
         }
