@@ -9,7 +9,7 @@ COPY frontend/package.json frontend/pnpm-lock.yaml ./
 RUN npm install -g pnpm@9 && pnpm install --frozen-lockfile
 
 # Copy source code
-COPY . .
+COPY frontend/ .
 
 # Build application
 ARG VITE_API_URL
