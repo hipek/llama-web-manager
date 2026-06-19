@@ -7,7 +7,8 @@ RUN npm install -g pnpm && pnpm install --frozen-lockfile
 
 COPY frontend/ .
 ARG NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://192.168.1.153:9000}
+ARG VITE_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-${VITE_API_URL:-http://localhost:9000}}
 RUN pnpm build
 
 # Runner stage
@@ -15,7 +16,6 @@ FROM node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV NEXT_PUBLIC_API_URL=http://192.168.1.153:9000
 
 # Copy standalone output
 COPY --from=build /app/.next/standalone ./
