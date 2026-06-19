@@ -14,7 +14,7 @@ export function hideOfflineBanner() {
 export function showToast(msg: string, type: 'success' | 'error' = 'success') {
   toastEl.textContent = msg
   toastEl.className = 'toast ' + type
-  setTimeout(() => { toastEl.className = '' }, 3000)
+  setTimeout(() => { toastEl.className = ''; toastEl.textContent = '' }, 3000)
 }
 
 export function showLoading(text?: string) {
