@@ -3,7 +3,7 @@ FROM node:20.14.0-alpine3.20 AS build
 WORKDIR /app
 
 # Copy package files first for layer caching
-COPY package.json pnpm-lock.yaml ./
+COPY frontend/package.json frontend/pnpm-lock.yaml ./
 
 # Install dependencies
 RUN npm install -g pnpm@9 && pnpm install --frozen-lockfile
