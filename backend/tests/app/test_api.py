@@ -108,3 +108,20 @@ class TestConfigEndpoint:
         assert data["server_port"] == 11434
         assert data["server_host"] == "0.0.0.0"
         assert "models_dir" in data
+
+    def test_update_config_unknown_param(self, client):
+        resp = client.post(
+            "/config",
+            json={"llamacpp_params": {"bad_param": 1}},
+        )
+        assert resp.status_code == 400
+        assert "error" in resp.json()
+
+
+class TestRestartEndpoint:
+    def test_restart(self, client, mock_manager):
+        mock_manager.restart.return_value = {"status": "restarting"}
+        resp = client.post("/restart")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["status"] == "restarting"

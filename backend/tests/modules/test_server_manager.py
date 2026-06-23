@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import signal
 import subprocess
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from backend.config.loader import ServerConfig
@@ -154,3 +155,56 @@ class TestGetStatus:
         status = sm.get_status()
         assert status["running"] is False
         assert status["model"] is None
+
+
+class TestRestart:
+    def test_restart_stops_then_starts(self, tmp_config: ServerConfig):
+        sm = ServerManager(tmp_config)
+        sm._process = _make_process(returncode=None, args=["--model", "/model.gguf"])
+        sm._current_model = "/model.gguf"
+        with patch("backend.modules.server_manager.subprocess.Popen") as mock_popen:
+            mock_popen.return_value = _make_process(returncode=None)
+            result = sm.restart()
+            assert result == {"status": "restarting"}
+            # stop() was called (process set to None), then Popen called
+            mock_popen.assert_called_once()
+
+    def test_restart_with_no_current_model(self, tmp_config: ServerConfig):
+        sm = ServerManager(tmp_config)
+        sm._process = _make_process(returncode=None)
+        sm._current_model = None
+        with patch("backend.modules.server_manager.subprocess.Popen") as mock_popen:
+            mock_popen.return_value = _make_process(returncode=None)
+            result = sm.restart()
+            assert result == {"status": "restarting"}
+            cmd = mock_popen.call_args[0][0]
+            assert "--model" not in cmd
+
+
+class TestIsReady:
+    def test_ready_when_log_contains_keyword(self, tmp_config: ServerConfig, tmp_path: Path):
+        sm = ServerManager(tmp_config)
+        sm._process = _make_process(returncode=None)
+        log_file = tmp_path / "llama-server.log"
+        log_file.write_text("llama_server: model loaded successfully\n")
+        sm._log_path = str(log_file)
+        assert sm.is_ready is True
+
+    def test_not_ready_when_keyword_missing(self, tmp_config: ServerConfig, tmp_path: Path):
+        sm = ServerManager(tmp_config)
+        sm._process = _make_process(returncode=None)
+        log_file = tmp_path / "llama-server.log"
+        log_file.write_text("loading weights...\n")
+        sm._log_path = str(log_file)
+        assert sm.is_ready is False
+
+    def test_not_ready_when_not_running(self, tmp_config: ServerConfig):
+        sm = ServerManager(tmp_config)
+        sm._process = None
+        assert sm.is_ready is False
+
+    def test_cached_ready_returns_true(self, tmp_config: ServerConfig):
+        sm = ServerManager(tmp_config)
+        sm._process = _make_process(returncode=None)
+        sm._ready = True
+        assert sm.is_ready is True
