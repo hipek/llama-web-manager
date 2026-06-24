@@ -1,4 +1,4 @@
-.PHONY: test build run stop check-types ci
+.PHONY: test build run stop check-types ci test-frontend
 
 test:
 	uv run pytest backend/tests/
@@ -6,7 +6,10 @@ test:
 check-types:
 	cd frontend && pnpm exec tsc --noEmit
 
-ci: check-types test
+ci: check-types test test-frontend
+
+test-frontend:
+	cd frontend && pnpm test
 
 build:
 	docker build -f frontend/Dockerfile --build-arg NEXT_PUBLIC_API_URL=$(NEXT_PUBLIC_API_URL) \
