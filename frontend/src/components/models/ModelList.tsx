@@ -6,7 +6,7 @@ import { ModelCard } from './ModelCard'
 interface Props {
   models: ModelFile[]
   running: boolean
-  onAction: (path: string, name: string) => void
+  onAction: (path: string, name: string, size?: number) => void
 }
 
 export function ModelList({ models, running, onAction }: Props) {

@@ -6,7 +6,7 @@ import { formatSize } from '@/lib/utils'
 interface Props {
   model: ModelFile
   running: boolean
-  onAction: (path: string, name: string) => void
+  onAction: (path: string, name: string, size?: number) => void
 }
 
 export function ModelCard({ model, running, onAction }: Props) {
@@ -19,7 +19,7 @@ export function ModelCard({ model, running, onAction }: Props) {
       </div>
       <div className="flex gap-2">
         <button
-          onClick={() => onAction(model.path, model.name)}
+          onClick={() => onAction(model.path, model.name, model.size)}
           className="btn btn-primary btn-sm"
         >
           {running ? 'Switch Model' : 'Load Model'}

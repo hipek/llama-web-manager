@@ -20,11 +20,11 @@ export function getRecentModels(): RecentModel[] {
   }
 }
 
-export function saveRecentModel(path: string, name: string): void {
+export function saveRecentModel(path: string, name: string, size?: number): void {
   if (typeof window === 'undefined') return
   const list = getRecentModels()
   const filtered = list.filter((m: RecentModel) => m.path !== path)
-  filtered.unshift({ path, name, time: Date.now() })
+  filtered.unshift({ path, name, size, time: Date.now() })
   const trimmed = filtered.slice(0, 3)
   localStorage.setItem('llama-web-manager-recent', JSON.stringify(trimmed))
 }

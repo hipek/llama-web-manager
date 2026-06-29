@@ -5,8 +5,8 @@ import type { RecentModel } from '@/types'
 export function useRecentModels() {
   const [models, setModels] = useState<RecentModel[]>(getRecentModels)
 
-  const addModel = useCallback((path: string, name: string) => {
-    saveRecentModel(path, name)
+  const addModel = useCallback((path: string, name: string, size?: number) => {
+    saveRecentModel(path, name, size)
     setModels(getRecentModels())
   }, [])
 

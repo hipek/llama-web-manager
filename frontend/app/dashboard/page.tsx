@@ -65,11 +65,11 @@ export default function DashboardPage() {
     }, 2000)
   }, [pollLoading, showError])
 
-  const handleLoadModel = useCallback(async (path: string, name: string) => {
+  const handleLoadModel = useCallback(async (path: string, name: string, size?: number) => {
     startLoading('Loading ' + name + '...')
     try {
       await loadModel(path)
-      addRecent(path, name)
+      addRecent(path, name, size)
       showToast('Loading ' + name + '...')
     } catch (e: unknown) {
       setLoadingVisible(false)

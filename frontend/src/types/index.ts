@@ -31,5 +31,6 @@ export interface ModelFile {
 export interface RecentModel {
   path: string
   name: string
+  size?: number
   time: number
 }

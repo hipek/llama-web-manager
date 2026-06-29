@@ -1,10 +1,10 @@
 'use client'
 
 import { useRecentModels } from '@/hooks/useRecentModels'
-import { modelName } from '@/lib/utils'
+import { formatSize, modelName } from '@/lib/utils'
 
 interface Props {
-  onAction: (path: string, name: string) => void
+  onAction: (path: string, name: string, size?: number) => void
 }
 
 export function RecentModels({ onAction }: Props) {
@@ -19,13 +19,15 @@ export function RecentModels({ onAction }: Props) {
       </h2>
       <div className="grid gap-3">
         {models.map((m, i) => (
-          <div key={m.path} className="model-card">
+          <div key={m.path} className="model-card flex-col sm:flex-row gap-3 sm:gap-0">
             <div className="model-info flex flex-col gap-1">
-              <div className="font-semibold text-sm text-dark-50">{modelName(m.path)}</div>
+              <div className="font-semibold text-sm text-dark-50">{m.name}</div>
+              <div className="text-xs text-dark-500 font-mono">{m.path}</div>
+              {m.size && <div className="text-xs text-dark-400">{formatSize(m.size)}</div>}
             </div>
             <div className="flex gap-2">
               <button
-                onClick={() => onAction(m.path, m.name)}
+                onClick={() => onAction(m.path, m.name, m.size)}
                 className="btn btn-primary btn-sm"
               >
                 {i === 0 ? 'Load again' : 'Load'}
