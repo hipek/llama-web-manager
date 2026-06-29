@@ -8,7 +8,7 @@ interface Props {
 }
 
 export function RecentModels({ onAction }: Props) {
-  const { models } = useRecentModels()
+  const { models, clear } = useRecentModels()
 
   if (models.length === 0) return null
 
@@ -16,6 +16,7 @@ export function RecentModels({ onAction }: Props) {
     <div className="mb-8">
       <h2 className="text-base font-semibold mb-3 text-dark-100 flex items-center gap-2">
         🔁 Recent Models
+        <button onClick={clear} className="ml-auto btn btn-ghost btn-xs">Clear</button>
       </h2>
       <div className="grid gap-3">
         {models.map((m, i) => (
