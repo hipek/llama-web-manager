@@ -20,6 +20,7 @@ class TestServerConfigDefaults:
         assert cfg.top_k == 10
         assert cfg.min_p == 0.05
         assert cfg.no_mmap is False
+        assert cfg.embeddings is True
 
     def test_custom_values(self):
         cfg = ServerConfig(
@@ -62,3 +63,15 @@ class TestLoadConfig:
         cfg_path.write_text(yaml.dump(data))
         cfg = load_config(cfg_path)
         assert cfg.no_mmap is True
+
+    def test_load_with_embeddings(self, tmp_path):
+        import yaml
+        data = {
+            "llama_server_path": "/bin/llama",
+            "models_dir": str(tmp_path / "models"),
+            "llamacpp_params": {"embeddings": True},
+        }
+        cfg_path = tmp_path / "config.yaml"
+        cfg_path.write_text(yaml.dump(data))
+        cfg = load_config(cfg_path)
+        assert cfg.embeddings is True

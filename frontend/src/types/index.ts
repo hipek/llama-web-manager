@@ -6,6 +6,7 @@ export interface LlammaCppParams {
   top_k: number
   min_p: number
   no_mmap: boolean
+  embeddings: boolean
 }
 
 export interface ServerConfig {

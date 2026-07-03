@@ -91,6 +91,8 @@ class ServerManager:
             cmd.extend(["--model", model_path])
         if self._config.no_mmap:
             cmd.append("--no-mmap")
+        if self._config.embeddings:
+            cmd.append("--embeddings")
         return cmd
 
     def restart(self) -> dict:

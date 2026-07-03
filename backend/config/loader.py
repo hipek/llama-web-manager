@@ -21,6 +21,7 @@ class ServerConfig:
     top_k: int = 10
     min_p: float = 0.05
     no_mmap: bool = False
+    embeddings: bool = True
 
 
 def load_config(path: str | pathlib.Path = "config.yaml") -> ServerConfig:

@@ -46,6 +46,7 @@ export async function fetchConfig(): Promise<ServerConfig> {
     top_k: 10,
     min_p: 0.05,
     no_mmap: false,
+    embeddings: true,
   }
   return data
 }

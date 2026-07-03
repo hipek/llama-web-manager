@@ -15,3 +15,4 @@ llamacpp_params:
   top_k: 10
   min_p: 0.05
   no_mmap: true
+  embeddings: true
