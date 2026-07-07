@@ -26,6 +26,7 @@ def tmp_config(tmp_path: Path) -> ServerConfig:
         min_p=0.05,
         no_mmap=False,
         embeddings=True,
+        jinja=True,
     )
     (tmp_path / "models").mkdir()
     return cfg

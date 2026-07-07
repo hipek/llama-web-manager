@@ -22,6 +22,7 @@ class ServerConfig:
     min_p: float = 0.05
     no_mmap: bool = False
     embeddings: bool = True
+    jinja: bool = True
 
 
 def load_config(path: str | pathlib.Path = "config.yaml") -> ServerConfig:

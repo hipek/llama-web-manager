@@ -93,6 +93,8 @@ class ServerManager:
             cmd.append("--no-mmap")
         if self._config.embeddings:
             cmd.append("--embeddings")
+        if not self._config.jinja:
+            cmd.append("--no-jinja")
         return cmd
 
     def restart(self) -> dict:

@@ -47,6 +47,7 @@ export async function fetchConfig(): Promise<ServerConfig> {
     min_p: 0.05,
     no_mmap: false,
     embeddings: true,
+    jinja: true,
   }
   return data
 }

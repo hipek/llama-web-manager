@@ -16,3 +16,4 @@ llamacpp_params:
   min_p: 0.05
   no_mmap: true
   embeddings: true
+  jinja: true

@@ -75,3 +75,15 @@ class TestLoadConfig:
         cfg_path.write_text(yaml.dump(data))
         cfg = load_config(cfg_path)
         assert cfg.embeddings is True
+
+    def test_load_with_jinja(self, tmp_path):
+        import yaml
+        data = {
+            "llama_server_path": "/bin/llama",
+            "models_dir": str(tmp_path / "models"),
+            "llamacpp_params": {"jinja": False},
+        }
+        cfg_path = tmp_path / "config.yaml"
+        cfg_path.write_text(yaml.dump(data))
+        cfg = load_config(cfg_path)
+        assert cfg.jinja is False

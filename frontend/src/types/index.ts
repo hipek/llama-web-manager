@@ -7,6 +7,7 @@ export interface LlammaCppParams {
   min_p: number
   no_mmap: boolean
   embeddings: boolean
+  jinja: boolean
 }
 
 export interface ServerConfig {

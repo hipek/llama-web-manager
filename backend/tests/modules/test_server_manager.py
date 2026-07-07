@@ -131,6 +131,30 @@ class TestStart:
             cmd = mock_popen.call_args[0][0]
             assert "--no-mmap" in cmd
 
+    def test_start_includes_no_jinja_when_disabled(self, tmp_config: ServerConfig):
+        cfg = ServerConfig(
+            llama_server_path=tmp_config.llama_server_path,
+            models_dir=tmp_config.models_dir,
+            server_port=tmp_config.server_port,
+            server_host=tmp_config.server_host,
+            web_port=tmp_config.web_port,
+            log_lines=tmp_config.log_lines,
+            context_size=tmp_config.context_size,
+            threads=tmp_config.threads,
+            temp=tmp_config.temp,
+            top_p=tmp_config.top_p,
+            top_k=tmp_config.top_k,
+            min_p=tmp_config.min_p,
+            embeddings=tmp_config.embeddings,
+            jinja=False,
+        )
+        with patch("backend.modules.server_manager.subprocess.Popen") as mock_popen:
+            mock_popen.return_value = _make_process(returncode=None)
+            sm = ServerManager(cfg)
+            sm.start("/path/to/model.gguf")
+            cmd = mock_popen.call_args[0][0]
+            assert "--no-jinja" in cmd
+
     def test_stop_called_before_start(self, tmp_config: ServerConfig):
         sm = ServerManager(tmp_config)
         sm._process = _make_process(returncode=None)
