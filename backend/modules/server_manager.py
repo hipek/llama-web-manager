@@ -95,6 +95,8 @@ class ServerManager:
             cmd.append("--embeddings")
         if not self._config.jinja:
             cmd.append("--no-jinja")
+        if self._config.n_cpu_moe > 0:
+            cmd.extend(["--n-cpu-moe", str(self._config.n_cpu_moe)])
         return cmd
 
     def restart(self) -> dict:

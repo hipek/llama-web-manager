@@ -8,6 +8,7 @@ export interface LlammaCppParams {
   no_mmap: boolean
   embeddings: boolean
   jinja: boolean
+  n_cpu_moe: number
 }
 
 export interface ServerConfig {

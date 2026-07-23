@@ -23,6 +23,7 @@ class ServerConfig:
     no_mmap: bool = False
     embeddings: bool = True
     jinja: bool = True
+    n_cpu_moe: int = 8
 
 
 def load_config(path: str | pathlib.Path = "config.yaml") -> ServerConfig:

@@ -53,7 +53,7 @@ async def list_models():
 
 
 VALID_LLM_PARAMS = {
-    "context_size", "threads", "temp", "top_p", "top_k", "min_p", "no_mmap", "embeddings", "jinja"
+    "context_size", "threads", "temp", "top_p", "top_k", "min_p", "no_mmap", "embeddings", "jinja", "n_cpu_moe"
 }
 
 
@@ -68,6 +68,7 @@ def _get_llm_params(cfg) -> dict:
         "no_mmap": cfg.no_mmap,
         "embeddings": cfg.embeddings,
         "jinja": cfg.jinja,
+        "n_cpu_moe": cfg.n_cpu_moe,
     }
 
 

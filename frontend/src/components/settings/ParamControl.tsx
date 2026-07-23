@@ -24,6 +24,7 @@ const PARAM_DEFS: ParamDef[] = [
   { key: 'no_mmap', label: 'No MMAP', min: 0, max: 1, step: 1 },
   { key: 'embeddings', label: 'Embeddings', min: 0, max: 1, step: 1 },
   { key: 'jinja', label: 'Jinja', min: 0, max: 1, step: 1 },
+  { key: 'n_cpu_moe', label: 'N CPU MOE', min: 0, max: 128, step: 1 },
 ]
 
 export function ParamControl({ param, value, onChange }: Props) {
