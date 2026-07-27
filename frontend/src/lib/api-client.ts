@@ -1,4 +1,4 @@
-import type { ServerConfig, StatusResponse, ModelFile, LlammaCppParams } from '@/types'
+import type { ServerConfig, StatusResponse, ModelFile, LlammaCppParams, GpuStats } from '@/types'
 
 const API_BASE = '/api'
 
@@ -90,4 +90,9 @@ export async function saveConfig(params: LlammaCppParams): Promise<void> {
 export async function restartServer(): Promise<void> {
   const res = await fetch(`${API_BASE}/restart`, { method: 'POST' })
   if (!res.ok) throw new Error('Failed to restart server')
+}
+
+export async function fetchGpuStats(): Promise<GpuStats[]> {
+  const res = await api('/gpu-stats')
+  return res.json()
 }

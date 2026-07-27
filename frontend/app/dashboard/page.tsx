@@ -7,6 +7,7 @@ import { StatusBar } from '@/components/layout/StatusBar'
 import { LoadingOverlay } from '@/components/layout/LoadingOverlay'
 import { useConfig } from '@/hooks/useConfig'
 import { useStatus } from '@/hooks/useStatus'
+import { useGpuStats } from '@/hooks/useGpuStats'
 import { useModels } from '@/hooks/useModels'
 import { useRecentModels } from '@/hooks/useRecentModels'
 import { useToast } from '@/hooks/useToast'
@@ -22,9 +23,13 @@ import type { LlammaCppParams } from '@/types'
 export default function DashboardPage() {
   const { config, loading: configLoading } = useConfig()
   const { status, scrollState, setScrollState, refresh: refreshStatus } = useStatus()
+  const { gpuStats } = useGpuStats()
   const { models, refresh: refreshModels } = useModels()
   const { addModel: addRecent } = useRecentModels()
   const { showToast, showError } = useToast()
+
+  // Only show first GPU (card0)
+  const gpuStatsCard0 = gpuStats ? gpuStats.slice(0, 1) : null
 
   const [loadingVisible, setLoadingVisible] = useState(false)
   const [loadingText, setLoadingText] = useState('')
@@ -44,11 +49,16 @@ export default function DashboardPage() {
       } else if (data.running && !data.model) {
         setLoadingVisible(false)
         showToast('Server restarted')
+      } else if (!data.running) {
+        // Server crashed or failed to start during loading
+        setLoadingVisible(false)
+        const msg = data.last_error || 'Server failed to start or crashed'
+        showError(msg)
       }
     } catch {
       // silent
     }
-  }, [showToast])
+  }, [showToast, showError])
 
   // Start loading poll when overlay shows
   const startLoading = useCallback((text: string) => {
@@ -182,6 +192,7 @@ export default function DashboardPage() {
             status={status}
             serverPort={config.server_port}
             serverHost={config.server_host}
+            gpuStats={gpuStatsCard0}
             onStop={handleStopServer}
           />
         )}

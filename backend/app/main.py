@@ -12,6 +12,7 @@ from backend.config.loader import load_config
 from backend.modules.model_scanner import scan_models
 from backend.modules.server_manager import ServerManager
 from backend.modules.log_reader import read_last_lines
+from backend.modules.gpu_stats import get_gpu_stats
 
 BASE_DIR = Path(__file__).parent.parent.parent
 config_path = BASE_DIR / "config.yaml"
@@ -41,6 +42,11 @@ async def get_status():
     status = manager.get_status()
     log_lines = read_last_lines(manager._log_path, config.log_lines)
     return JSONResponse({**status, "log_lines": log_lines})
+
+
+@router.get("/gpu-stats")
+async def get_gpu_stats_endpoint():
+    return JSONResponse(get_gpu_stats())
 
 
 @router.get("/models")

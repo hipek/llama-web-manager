@@ -16,6 +16,7 @@ class ServerManager:
         self._process: subprocess.Popen | None = None
         self._current_model: str | None = None
         self._ready: bool = False
+        self._last_error: str | None = None
         self._lock = threading.Lock()
         self._log_path = self._resolve_log_path()
 
@@ -61,6 +62,7 @@ class ServerManager:
         self.stop()
         with self._lock:
             self._ready = False
+            self._last_error = None
             cmd = self._build_cmd(model_path)
             self._process = subprocess.Popen(
                 cmd,
@@ -69,6 +71,8 @@ class ServerManager:
                 text=True,
             )
             self._current_model = model_path
+        # Brief check for immediate startup failure
+        self._check_startup_failure()
         return {"status": "loading", "model": model_path}
 
     def _build_cmd(self, model_path: str | None = None) -> list[str]:
@@ -105,6 +109,7 @@ class ServerManager:
         self.stop()
         with self._lock:
             self._ready = False
+            self._last_error = None
             cmd = self._build_cmd(model_path)
             self._process = subprocess.Popen(
                 cmd,
@@ -112,6 +117,7 @@ class ServerManager:
                 stderr=subprocess.STDOUT,
                 text=True,
             )
+        self._check_startup_failure()
         return {"status": "restarting"}
 
     @property
@@ -130,6 +136,18 @@ class ServerManager:
             return True
         return False
 
+    def _check_startup_failure(self) -> None:
+        """Check if process died shortly after start and capture the error."""
+        import time
+        time.sleep(0.5)
+        with self._lock:
+            if self._process is None:
+                return
+            rc = self._process.poll()
+            if rc is not None:
+                lines = read_last_lines(self._log_path, 3)
+                self._last_error = f"Process exited with code {rc}: {' | '.join(lines)}"
+
     def get_status(self) -> dict:
         with self._lock:
             running = self._process is not None and self._process.poll() is None
@@ -137,4 +155,5 @@ class ServerManager:
             "running": running,
             "model": self.current_model,
             "ready": self.is_ready,
+            "last_error": self._last_error,
         }

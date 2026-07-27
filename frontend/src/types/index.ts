@@ -31,6 +31,14 @@ export interface ModelFile {
   size: number
 }
 
+export interface GpuStats {
+  vram_total: number
+  vram_used: number
+  vram_used_pct: number | null
+  gpu_busy_pct: number | null
+  mem_busy_pct: number | null
+}
+
 export interface RecentModel {
   path: string
   name: string
