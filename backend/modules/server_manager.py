@@ -101,10 +101,11 @@ class ServerManager:
 
     def restart(self) -> dict:
         """Stop and restart llama-server with current config params and model."""
+        model_path = self._current_model
         self.stop()
         with self._lock:
             self._ready = False
-            cmd = self._build_cmd(self._current_model)
+            cmd = self._build_cmd(model_path)
             self._process = subprocess.Popen(
                 cmd,
                 stdout=subprocess.PIPE,
