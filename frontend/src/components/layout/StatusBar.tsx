@@ -65,10 +65,6 @@ export function StatusBar({ status, serverPort, serverHost, gpuStats, onStop }: 
                   style={{ width: `${gpu.vram_used_pct ?? 0}%` }}
                 />
               </div>
-              <div className="flex gap-3 text-dark-400">
-                <span>GPU {gpu.gpu_busy_pct ?? 0}%</span>
-                <span>MEM {gpu.mem_busy_pct ?? 0}%</span>
-              </div>
             </div>
           ))}
         </div>
