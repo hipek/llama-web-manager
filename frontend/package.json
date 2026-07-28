@@ -11,22 +11,23 @@
     "test": "jest"
   },
   "dependencies": {
-    "next": "16.2.11",
+    "next": "16.2.12",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "4.3.3",
     "@types/jest": "^30.0.0",
-    "@types/node": "^22.10.0",
-    "@types/react": "19.2.8",
+    "@types/node": "^26.1.1",
+    "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
-    "autoprefixer": "^10.4.20",
+    "autoprefixer": "^10.5.4",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
-    "jsdom": "^29.1.1",
-    "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.16",
-    "ts-jest": "^29.4.11",
-    "typescript": "^5.7.0"
+    "jsdom": "^30.0.0",
+    "postcss": "^8.5.23",
+    "tailwindcss": "^4.3.3",
+    "ts-jest": "^29.4.12",
+    "typescript": "^5.9.3"
   }
 }
