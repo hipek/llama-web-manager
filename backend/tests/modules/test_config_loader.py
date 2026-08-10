@@ -21,6 +21,8 @@ class TestServerConfigDefaults:
         assert cfg.min_p == 0.05
         assert cfg.no_mmap is False
         assert cfg.embeddings is True
+        assert cfg.reasoning_budget == 8192
+        assert cfg.reasoning_budget_message == ""
 
     def test_custom_values(self):
         cfg = ServerConfig(

@@ -48,6 +48,8 @@ export async function fetchConfig(): Promise<ServerConfig> {
     no_mmap: false,
     embeddings: true,
     jinja: true,
+    reasoning_budget: 8192,
+    reasoning_budget_message: '',
   }
   return data
 }

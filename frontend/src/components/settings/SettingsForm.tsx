@@ -17,7 +17,7 @@ export function SettingsForm({ params, onSave, onRestart }: Props) {
     setLocalParams(params)
   }, [params])
 
-  const handleChange = (key: string, value: number | boolean) => {
+  const handleChange = (key: string, value: number | boolean | string) => {
     setLocalParams(prev => ({ ...prev, [key]: value }))
   }
 

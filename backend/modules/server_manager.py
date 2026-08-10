@@ -101,6 +101,9 @@ class ServerManager:
             cmd.append("--no-jinja")
         if self._config.n_cpu_moe > 0:
             cmd.extend(["--n-cpu-moe", str(self._config.n_cpu_moe)])
+        cmd.extend(["--reasoning-budget", str(self._config.reasoning_budget)])
+        if self._config.reasoning_budget_message:
+            cmd.extend(["--reasoning-budget-message", self._config.reasoning_budget_message])
         return cmd
 
     def restart(self) -> dict:

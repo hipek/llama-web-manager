@@ -17,3 +17,5 @@ llamacpp_params:
   no_mmap: true
   embeddings: true
   jinja: true
+  reasoning_budget: 8192
+  reasoning_budget_message: "\n\nOK, I have enough to answer now.\n"

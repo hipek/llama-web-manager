@@ -24,6 +24,8 @@ class ServerConfig:
     embeddings: bool = True
     jinja: bool = True
     n_cpu_moe: int = 8
+    reasoning_budget: int = 8192
+    reasoning_budget_message: str = ""
 
 
 def load_config(path: str | pathlib.Path = "config.yaml") -> ServerConfig:

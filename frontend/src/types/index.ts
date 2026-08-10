@@ -9,6 +9,8 @@ export interface LlammaCppParams {
   embeddings: boolean
   jinja: boolean
   n_cpu_moe: number
+  reasoning_budget: number
+  reasoning_budget_message: string
 }
 
 export interface ServerConfig {

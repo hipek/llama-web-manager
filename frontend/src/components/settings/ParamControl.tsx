@@ -3,15 +3,16 @@
 interface ParamDef {
   key: string
   label: string
-  min: number
-  max: number
-  step: number
+  min?: number
+  max?: number
+  step?: number
+  type?: 'text'
 }
 
 interface Props {
   param: ParamDef
-  value: number | boolean
-  onChange: (key: string, value: number | boolean) => void
+  value: number | boolean | string
+  onChange: (key: string, value: number | boolean | string) => void
 }
 
 const PARAM_DEFS: ParamDef[] = [
@@ -25,17 +26,27 @@ const PARAM_DEFS: ParamDef[] = [
   { key: 'embeddings', label: 'Embeddings', min: 0, max: 1, step: 1 },
   { key: 'jinja', label: 'Jinja', min: 0, max: 1, step: 1 },
   { key: 'n_cpu_moe', label: 'N CPU MOE', min: 0, max: 128, step: 1 },
+  { key: 'reasoning_budget', label: 'Reasoning Budget', min: -1, max: 65536, step: 256 },
+  { key: 'reasoning_budget_message', label: 'Reasoning Budget Msg', type: 'text' },
 ]
 
 export function ParamControl({ param, value, onChange }: Props) {
   const isBool = typeof value === 'boolean'
+  const isText = param.type === 'text'
 
   return (
     <div className="bg-dark-800 border border-dark-700 rounded-lg p-3 sm:p-4">
       <label className="flex items-center justify-between gap-4">
         <span className="text-xs text-dark-400">{param.label}</span>
         <div className="flex items-center gap-3">
-          {isBool ? (
+          {isText ? (
+            <input
+              type="text"
+              value={value as string}
+              onChange={e => onChange(param.key, e.target.value)}
+              className="w-48 rounded-md border border-dark-700 bg-dark-900 px-2 py-1 text-xs text-dark-100 accent-primary"
+            />
+          ) : isBool ? (
             <input
               type="checkbox"
               checked={value as boolean}
@@ -54,7 +65,7 @@ export function ParamControl({ param, value, onChange }: Props) {
             />
           )}
           <span className="text-xs text-accent-blue font-mono min-w-[3rem] text-right">
-            {isBool ? (value as boolean ? 'ON' : 'OFF') : value}
+            {isText ? value : isBool ? (value as boolean ? 'ON' : 'OFF') : value}
           </span>
         </div>
       </label>

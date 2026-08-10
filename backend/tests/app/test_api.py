@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, patch
 
 import httpx2
 import pytest
+import yaml
 from starlette.testclient import TestClient
 
 from backend.app.main import app
@@ -116,6 +117,23 @@ class TestConfigEndpoint:
         )
         assert resp.status_code == 400
         assert "error" in resp.json()
+
+    def test_update_config_accepts_reasoning_params(self, client, tmp_path):
+        cfg_path = tmp_path / "config.yaml"
+        cfg_path.write_text(
+            "llama_server_path: /usr/bin/llama-server\n"
+            "models_dir: /tmp/models\n"
+            "llamacpp_params: {}\n"
+        )
+        params = {
+            "reasoning_budget": 8192,
+            "reasoning_budget_message": "\n\nOK, I have enough to answer now.\n",
+        }
+        with patch("backend.app.main.config_path", cfg_path):
+            resp = client.post("/config", json={"llamacpp_params": params})
+        assert resp.status_code == 200
+        data = yaml.safe_load(cfg_path.read_text())
+        assert data["llamacpp_params"] == params
 
 
 class TestRestartEndpoint:
