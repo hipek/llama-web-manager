@@ -9,6 +9,7 @@ import pytest
 import yaml
 from starlette.testclient import TestClient
 
+from backend.app import state
 from backend.app.main import app
 
 
@@ -33,10 +34,11 @@ def mock_config(tmp_path: Path):
 
 
 @pytest.fixture
-def client(mock_manager, mock_config):
+def client(mock_manager, mock_config, tmp_path):
     # Patch the module-level instances
-    with patch("backend.app.main.manager", mock_manager) as p1, \
-         patch("backend.app.main.config", mock_config) as p2:
+    with patch.object(state, "manager", mock_manager), \
+         patch.object(state, "config", mock_config), \
+         patch.object(state, "config_path", tmp_path / "config.yaml"):
         yield TestClient(app)
 
 
@@ -66,7 +68,7 @@ class TestModelsEndpoint:
             ModelFile(name="a.gguf", path="/models/a.gguf", size=1024),
             ModelFile(name="b.gguf", path="/models/b.gguf", size=2048),
         ]
-        with patch("backend.app.main.scan_models", return_value=mock_models):
+        with patch("backend.modules.model_scanner.scan_models", return_value=mock_models):
             resp = client.get("/models")
             assert resp.status_code == 200
             data = resp.json()
@@ -129,7 +131,7 @@ class TestConfigEndpoint:
             "reasoning_budget": 8192,
             "reasoning_budget_message": "\n\nOK, I have enough to answer now.\n",
         }
-        with patch("backend.app.main.config_path", cfg_path):
+        with patch.object(state, "config_path", cfg_path):
             resp = client.post("/config", json={"llamacpp_params": params})
         assert resp.status_code == 200
         data = yaml.safe_load(cfg_path.read_text())
@@ -137,7 +139,8 @@ class TestConfigEndpoint:
 
 
 class TestRestartEndpoint:
-    def test_restart(self, client, mock_manager):
+    def test_restart(self, client, mock_manager, tmp_path):
+        (tmp_path / "config.yaml").write_text("llama_server_path: /usr/bin/llama-server\nmodels_dir: /tmp/models\nserver_port: 11434\n")
         mock_manager.restart.return_value = {"status": "restarting"}
         resp = client.post("/restart")
         assert resp.status_code == 200
