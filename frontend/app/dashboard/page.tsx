@@ -16,6 +16,7 @@ import { RecentModels } from '@/components/models/RecentModels'
 import { SettingsForm } from '@/components/settings/SettingsForm'
 import { LogViewer } from '@/components/logging/LogViewer'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
+import { CustomParams } from '@/components/settings/CustomParams'
 import { loadModel, stopServer, saveConfig, restartServer, checkBackend } from '@/lib/api-client'
 import { modelName } from '@/lib/utils'
 import type { LlammaCppParams } from '@/types'
@@ -110,6 +111,16 @@ export default function DashboardPage() {
       showError(e instanceof Error ? e.message : 'Failed to save settings')
     }
   }, [showToast, showError])
+
+  const handleSaveCustomParams = useCallback(async (params: Record<string, string>) => {
+    try {
+      if (!config?.llamacpp_params) throw new Error('No config')
+      await saveConfig({ ...config.llamacpp_params, custom_params: params })
+      showToast('Custom params saved')
+    } catch (e: unknown) {
+      showError(e instanceof Error ? e.message : 'Failed to save custom params')
+    }
+  }, [config?.llamacpp_params, showToast, showError])
 
   const handleRestartServer = useCallback(() => {
     setConfirmVisible(true)
@@ -221,6 +232,16 @@ export default function DashboardPage() {
               onRestart={handleRestartServer}
             />
           )}
+        </section>
+
+        <section className="mb-8">
+          <h2 className="text-base font-semibold mb-3 text-dark-100 flex items-center gap-2">
+            🔧 Custom llama.cpp Params
+          </h2>
+          <CustomParams
+            value={config.llamacpp_params.custom_params ?? {}}
+            onChange={handleSaveCustomParams}
+          />
         </section>
 
         <LogViewer

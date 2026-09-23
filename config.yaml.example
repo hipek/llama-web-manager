@@ -18,3 +18,6 @@ llamacpp_params:
   jinja: true
   reasoning_budget: 8192
   reasoning_budget_message: "\n\nOK, I have enough to answer now.\n"
+  custom_params:
+    spec-type: draft-mtp
+    spec-draft-n-max: "2"

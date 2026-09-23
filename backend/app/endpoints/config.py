@@ -30,6 +30,7 @@ def _get_llm_params(cfg) -> dict:
         "n_cpu_moe": cfg.n_cpu_moe,
         "reasoning_budget": cfg.reasoning_budget,
         "reasoning_budget_message": cfg.reasoning_budget_message,
+        "custom_params": cfg.custom_params,
     }
 
 
@@ -48,11 +49,15 @@ async def update_config(request: Request):
     body = await request.json()
     params = body.get("llamacpp_params", {})
 
+    # Skip whitelist validation for custom_params
+    custom = params.pop("custom_params", None)
     for key in params:
         if key not in VALID_LLM_PARAMS:
             return JSONResponse(
                 {"error": f"Unknown param: {key}"}, status_code=400
             )
+    if custom:
+        params["custom_params"] = custom
 
     with open(state.config_path) as f:
         data = yaml.safe_load(f)

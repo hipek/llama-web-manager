@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pathlib
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import yaml
 
@@ -25,6 +25,7 @@ class ServerConfig:
     n_cpu_moe: int = 8
     reasoning_budget: int = 8192
     reasoning_budget_message: str = ""
+    custom_params: dict[str, str] = field(default_factory=dict)
 
 
 def load_config(path: str | pathlib.Path = "config.yaml") -> ServerConfig:

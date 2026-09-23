@@ -10,6 +10,7 @@ export interface LlammaCppParams {
   n_cpu_moe: number
   reasoning_budget: number
   reasoning_budget_message: string
+  custom_params?: Record<string, string>
 }
 
 export interface ServerConfig {
