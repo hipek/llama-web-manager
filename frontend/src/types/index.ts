@@ -5,7 +5,6 @@ export interface LlammaCppParams {
   top_p: number
   top_k: number
   min_p: number
-  no_mmap: boolean
   embeddings: boolean
   jinja: boolean
   n_cpu_moe: number

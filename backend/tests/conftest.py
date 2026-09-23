@@ -24,7 +24,6 @@ def tmp_config(tmp_path: Path) -> ServerConfig:
         top_p=0.9,
         top_k=10,
         min_p=0.05,
-        no_mmap=False,
         embeddings=True,
         jinja=True,
     )

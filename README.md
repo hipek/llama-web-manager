@@ -144,7 +144,6 @@ cp config.yaml.example config.yaml
 | `top_p` | `0.9` | Top-p sampling threshold |
 | `top_k` | `10` | Top-k sampling threshold |
 | `min_p` | `0.05` | Minimum probability for sampling |
-| `no_mmap` | `true` | Disable memory-mapped file I/O |
 
 See [config.yaml.example](config.yaml.example) for all options.
 

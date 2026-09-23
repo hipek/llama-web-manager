@@ -20,7 +20,6 @@ class ServerConfig:
     top_p: float = 0.9
     top_k: int = 10
     min_p: float = 0.05
-    no_mmap: bool = False
     embeddings: bool = True
     jinja: bool = True
     n_cpu_moe: int = 8

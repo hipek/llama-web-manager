@@ -19,7 +19,6 @@ class TestServerConfigDefaults:
         assert cfg.top_p == 0.9
         assert cfg.top_k == 10
         assert cfg.min_p == 0.05
-        assert cfg.no_mmap is False
         assert cfg.embeddings is True
         assert cfg.reasoning_budget == 8192
         assert cfg.reasoning_budget_message == ""
@@ -53,18 +52,6 @@ class TestLoadConfig:
         assert cfg.server_port == 11434
         assert cfg.context_size == 8000
         assert cfg.threads == 4
-
-    def test_load_with_no_mmap(self, tmp_path):
-        import yaml
-        data = {
-            "llama_server_path": "/bin/llama",
-            "models_dir": str(tmp_path / "models"),
-            "llamacpp_params": {"no_mmap": True},
-        }
-        cfg_path = tmp_path / "config.yaml"
-        cfg_path.write_text(yaml.dump(data))
-        cfg = load_config(cfg_path)
-        assert cfg.no_mmap is True
 
     def test_load_with_embeddings(self, tmp_path):
         import yaml

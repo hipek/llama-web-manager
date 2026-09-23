@@ -22,7 +22,6 @@ const PARAM_DEFS: ParamDef[] = [
   { key: 'top_p', label: 'Top P', min: 0, max: 1, step: 0.05 },
   { key: 'top_k', label: 'Top K', min: 1, max: 100, step: 1 },
   { key: 'min_p', label: 'Min P', min: 0, max: 1, step: 0.01 },
-  { key: 'no_mmap', label: 'No MMAP', min: 0, max: 1, step: 1 },
   { key: 'embeddings', label: 'Embeddings', min: 0, max: 1, step: 1 },
   { key: 'jinja', label: 'Jinja', min: 0, max: 1, step: 1 },
   { key: 'n_cpu_moe', label: 'N CPU MOE', min: 0, max: 128, step: 1 },

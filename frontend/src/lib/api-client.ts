@@ -45,7 +45,6 @@ export async function fetchConfig(): Promise<ServerConfig> {
     top_p: 0.9,
     top_k: 10,
     min_p: 0.05,
-    no_mmap: false,
     embeddings: true,
     jinja: true,
     reasoning_budget: 8192,

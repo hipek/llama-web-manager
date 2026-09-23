@@ -13,7 +13,7 @@ from backend.config.loader import load_config
 router = APIRouter()
 
 VALID_LLM_PARAMS = {
-    "context_size", "threads", "temp", "top_p", "top_k", "min_p", "no_mmap", "embeddings", "jinja", "n_cpu_moe", "reasoning_budget", "reasoning_budget_message"
+    "context_size", "threads", "temp", "top_p", "top_k", "min_p", "embeddings", "jinja", "n_cpu_moe", "reasoning_budget", "reasoning_budget_message"
 }
 
 
@@ -25,7 +25,6 @@ def _get_llm_params(cfg) -> dict:
         "top_p": cfg.top_p,
         "top_k": cfg.top_k,
         "min_p": cfg.min_p,
-        "no_mmap": cfg.no_mmap,
         "embeddings": cfg.embeddings,
         "jinja": cfg.jinja,
         "n_cpu_moe": cfg.n_cpu_moe,

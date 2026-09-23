@@ -93,8 +93,6 @@ class ServerManager:
         ]
         if model_path:
             cmd.extend(["--model", model_path])
-        if self._config.no_mmap:
-            cmd.append("--no-mmap")
         if self._config.embeddings:
             cmd.append("--embeddings")
         if not self._config.jinja:
