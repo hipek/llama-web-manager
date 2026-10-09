@@ -33,5 +33,14 @@ def load_config(path: str | pathlib.Path = "config.yaml") -> ServerConfig:
         data = yaml.safe_load(f)
     # Flatten llamacpp_params into top-level fields
     llm = data.pop("llamacpp_params", {})
+    custom_params = llm.get("custom_params")
+    if isinstance(custom_params, dict):
+        llm["custom_params"] = {
+            str(key).strip().lstrip("-"): str(value)
+            for key, value in custom_params.items()
+            if str(key).strip() and value is not None and str(value).strip()
+        }
+        if not llm["custom_params"]:
+            llm.pop("custom_params")
     data.update(llm)
     return ServerConfig(**data)

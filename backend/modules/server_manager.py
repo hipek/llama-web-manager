@@ -103,7 +103,11 @@ class ServerManager:
         if self._config.reasoning_budget_message:
             cmd.extend(["--reasoning-budget-message", self._config.reasoning_budget_message])
         for key, value in self._config.custom_params.items():
-            cmd.extend([f"--{key}", value])
+            # Ignore blank entries left by older or hand-edited config files.
+            # The settings API validates names before saving new entries.
+            if not key or not key.strip() or value is None or not str(value).strip():
+                continue
+            cmd.extend([f"--{key.lstrip('-')}", str(value)])
         return cmd
 
     def restart(self) -> dict:
