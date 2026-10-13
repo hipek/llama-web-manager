@@ -102,6 +102,14 @@ class ServerManager:
         cmd.extend(["--reasoning-budget", str(self._config.reasoning_budget)])
         if self._config.reasoning_budget_message:
             cmd.extend(["--reasoning-budget-message", self._config.reasoning_budget_message])
+        for key, value in self._config.custom_params.items():
+            # Ignore blank entries left by older or hand-edited config files.
+            # The settings API validates names before saving new entries.
+            if not key or not key.strip():
+                continue
+            cmd.append(f"--{key.lstrip('-')}")
+            if value is not None and str(value).strip():
+                cmd.append(str(value))
         return cmd
 
     def restart(self) -> dict:

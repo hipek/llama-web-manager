@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { Header } from '@/components/layout/Header'
 import { OfflineBanner } from '@/components/layout/OfflineBanner'
 import { StatusBar } from '@/components/layout/StatusBar'
@@ -16,6 +16,7 @@ import { RecentModels } from '@/components/models/RecentModels'
 import { SettingsForm } from '@/components/settings/SettingsForm'
 import { LogViewer } from '@/components/logging/LogViewer'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
+import { CustomParams } from '@/components/settings/CustomParams'
 import { loadModel, stopServer, saveConfig, restartServer, checkBackend } from '@/lib/api-client'
 import { modelName } from '@/lib/utils'
 import type { LlammaCppParams } from '@/types'
@@ -37,6 +38,8 @@ export default function DashboardPage() {
   const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null)
   const [confirmMessage, setConfirmMessage] = useState('')
   const [confirmLabel, setConfirmLabel] = useState('')
+  const customParamsSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const customParamsSaveQueue = useRef<Promise<void>>(Promise.resolve())
 
   // Poll status periodically for loading progress
   const pollLoading = useCallback(async () => {
@@ -110,6 +113,22 @@ export default function DashboardPage() {
       showError(e instanceof Error ? e.message : 'Failed to save settings')
     }
   }, [showToast, showError])
+
+  const handleSaveCustomParams = useCallback((params: Record<string, string | null>) => {
+    if (customParamsSaveTimer.current) clearTimeout(customParamsSaveTimer.current)
+    customParamsSaveTimer.current = setTimeout(() => {
+      customParamsSaveQueue.current = customParamsSaveQueue.current
+        .catch(() => undefined)
+        .then(async () => {
+          if (!config?.llamacpp_params) throw new Error('No config')
+          await saveConfig({ ...config.llamacpp_params, custom_params: params })
+          showToast('Custom params saved')
+        })
+        .catch((e: unknown) => {
+          showError(e instanceof Error ? e.message : 'Failed to save custom params')
+        })
+    }, 400)
+  }, [config?.llamacpp_params, showToast, showError])
 
   const handleRestartServer = useCallback(() => {
     setConfirmVisible(true)
@@ -221,6 +240,16 @@ export default function DashboardPage() {
               onRestart={handleRestartServer}
             />
           )}
+        </section>
+
+        <section className="mb-8">
+          <h2 className="text-base font-semibold mb-3 text-dark-100 flex items-center gap-2">
+            🔧 Custom llama.cpp Params
+          </h2>
+          <CustomParams
+            value={config.llamacpp_params.custom_params ?? {}}
+            onChange={handleSaveCustomParams}
+          />
         </section>
 
         <LogViewer

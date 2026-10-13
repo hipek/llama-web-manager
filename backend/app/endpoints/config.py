@@ -30,6 +30,7 @@ def _get_llm_params(cfg) -> dict:
         "n_cpu_moe": cfg.n_cpu_moe,
         "reasoning_budget": cfg.reasoning_budget,
         "reasoning_budget_message": cfg.reasoning_budget_message,
+        "custom_params": cfg.custom_params,
     }
 
 
@@ -48,20 +49,41 @@ async def update_config(request: Request):
     body = await request.json()
     params = body.get("llamacpp_params", {})
 
+    # Custom flags are open-ended; null represents a valueless boolean flag.
+    custom = params.pop("custom_params", None)
     for key in params:
         if key not in VALID_LLM_PARAMS:
             return JSONResponse(
                 {"error": f"Unknown param: {key}"}, status_code=400
             )
+    if custom is not None:
+        if not isinstance(custom, dict):
+            return JSONResponse({"error": "custom_params must be an object"}, status_code=400)
+        clean_custom = {}
+        for key, value in custom.items():
+            name = str(key).strip().lstrip("-")
+            if not name:
+                return JSONResponse({"error": "Custom parameter names cannot be empty"}, status_code=400)
+            if value is None:
+                clean_custom[name] = None
+                continue
+            if not str(value).strip():
+                continue
+            clean_custom[name] = str(value)
+        if clean_custom:
+            params["custom_params"] = clean_custom
 
     with open(state.config_path) as f:
         data = yaml.safe_load(f)
 
-    data["llamacpp_params"] = {**data.get("llamacpp_params", {}), **params}
+    llm_params = {**data.get("llamacpp_params", {}), **params}
+    if custom is not None and not params.get("custom_params"):
+        llm_params.pop("custom_params", None)
+    data["llamacpp_params"] = llm_params
 
     with open(state.config_path, 'w') as f:
         yaml.dump(data, f, default_flow_style=False)
 
     state.config = load_config(state.config_path)
 
-    return {"status": "saved", "llamacpp_params": params}
+    return {"status": "saved", "llamacpp_params": {**params, **({"custom_params": llm_params["custom_params"]} if "custom_params" in llm_params else {})}}
