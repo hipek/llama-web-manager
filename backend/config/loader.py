@@ -25,7 +25,7 @@ class ServerConfig:
     n_cpu_moe: int = 8
     reasoning_budget: int = 8192
     reasoning_budget_message: str = ""
-    custom_params: dict[str, str] = field(default_factory=dict)
+    custom_params: dict[str, str | None] = field(default_factory=dict)
 
 
 def load_config(path: str | pathlib.Path = "config.yaml") -> ServerConfig:
@@ -34,11 +34,13 @@ def load_config(path: str | pathlib.Path = "config.yaml") -> ServerConfig:
     # Flatten llamacpp_params into top-level fields
     llm = data.pop("llamacpp_params", {})
     custom_params = llm.get("custom_params")
-    if isinstance(custom_params, dict):
+    if "custom_params" in llm:
+        if not isinstance(custom_params, dict):
+            raise ValueError("llamacpp_params.custom_params must be a mapping")
         llm["custom_params"] = {
-            str(key).strip().lstrip("-"): str(value)
+            str(key).strip().lstrip("-"): (None if value is None else str(value))
             for key, value in custom_params.items()
-            if str(key).strip() and value is not None and str(value).strip()
+            if str(key).strip() and (value is None or str(value).strip())
         }
         if not llm["custom_params"]:
             llm.pop("custom_params")

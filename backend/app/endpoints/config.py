@@ -49,7 +49,7 @@ async def update_config(request: Request):
     body = await request.json()
     params = body.get("llamacpp_params", {})
 
-    # Custom flags are open-ended, but require a non-empty option name/value.
+    # Custom flags are open-ended; null represents a valueless boolean flag.
     custom = params.pop("custom_params", None)
     for key in params:
         if key not in VALID_LLM_PARAMS:
@@ -64,7 +64,10 @@ async def update_config(request: Request):
             name = str(key).strip().lstrip("-")
             if not name:
                 return JSONResponse({"error": "Custom parameter names cannot be empty"}, status_code=400)
-            if value is None or not str(value).strip():
+            if value is None:
+                clean_custom[name] = None
+                continue
+            if not str(value).strip():
                 continue
             clean_custom[name] = str(value)
         if clean_custom:

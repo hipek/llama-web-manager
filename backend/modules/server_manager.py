@@ -105,9 +105,11 @@ class ServerManager:
         for key, value in self._config.custom_params.items():
             # Ignore blank entries left by older or hand-edited config files.
             # The settings API validates names before saving new entries.
-            if not key or not key.strip() or value is None or not str(value).strip():
+            if not key or not key.strip():
                 continue
-            cmd.extend([f"--{key.lstrip('-')}", str(value)])
+            cmd.append(f"--{key.lstrip('-')}")
+            if value is not None and str(value).strip():
+                cmd.append(str(value))
         return cmd
 
     def restart(self) -> dict:

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { Header } from '@/components/layout/Header'
 import { OfflineBanner } from '@/components/layout/OfflineBanner'
 import { StatusBar } from '@/components/layout/StatusBar'
@@ -38,6 +38,8 @@ export default function DashboardPage() {
   const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null)
   const [confirmMessage, setConfirmMessage] = useState('')
   const [confirmLabel, setConfirmLabel] = useState('')
+  const customParamsSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const customParamsSaveQueue = useRef<Promise<void>>(Promise.resolve())
 
   // Poll status periodically for loading progress
   const pollLoading = useCallback(async () => {
@@ -112,14 +114,20 @@ export default function DashboardPage() {
     }
   }, [showToast, showError])
 
-  const handleSaveCustomParams = useCallback(async (params: Record<string, string>) => {
-    try {
-      if (!config?.llamacpp_params) throw new Error('No config')
-      await saveConfig({ ...config.llamacpp_params, custom_params: params })
-      showToast('Custom params saved')
-    } catch (e: unknown) {
-      showError(e instanceof Error ? e.message : 'Failed to save custom params')
-    }
+  const handleSaveCustomParams = useCallback((params: Record<string, string | null>) => {
+    if (customParamsSaveTimer.current) clearTimeout(customParamsSaveTimer.current)
+    customParamsSaveTimer.current = setTimeout(() => {
+      customParamsSaveQueue.current = customParamsSaveQueue.current
+        .catch(() => undefined)
+        .then(async () => {
+          if (!config?.llamacpp_params) throw new Error('No config')
+          await saveConfig({ ...config.llamacpp_params, custom_params: params })
+          showToast('Custom params saved')
+        })
+        .catch((e: unknown) => {
+          showError(e instanceof Error ? e.message : 'Failed to save custom params')
+        })
+    }, 400)
   }, [config?.llamacpp_params, showToast, showError])
 
   const handleRestartServer = useCallback(() => {
